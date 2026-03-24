@@ -297,7 +297,7 @@
     Pick terrible ingredients. Reject anything sensible.<br>
     The Geneva Convention does not apply here.
   </p>
-  <button class="btn btn-start" onclick="showModeSelect()">BEGIN THE CRIME</button>
+  <button class="btn btn-start" onclick="startLobbyMusic();showModeSelect()">BEGIN THE CRIME</button>
   <div class="stamp">NOT FOOD SAFE</div>
 </div>
 
@@ -696,10 +696,12 @@ const TEMP_OPTIONS=[
 // ═══════════════════════════════════════
 // FLOW
 // ═══════════════════════════════════════
-function showModeSelect(){
-  showScreen('mode-screen');
+function startLobbyMusic(){
   if(!musicPlaying) startMusic(lobbyTrack);
   else switchTrack(lobbyTrack);
+}
+function showModeSelect(){
+  showScreen('mode-screen');
 }
 
 function startGame(mode){
