@@ -106,7 +106,8 @@
   .ingredient.added { opacity:0.2; pointer-events:none; transform:scale(0.8); }
 
   .bowl-area { position:relative; width:280px; height:200px; display:flex; align-items:center; justify-content:center; }
-  .bowl-svg { filter:drop-shadow(0 10px 30px rgba(0,0,0,0.5)); transition:transform 0.3s; }
+  .bowl-svg { filter:drop-shadow(0 10px 30px rgba(0,0,0,0.5)); transition:transform 0.3s; display:flex; align-items:center; justify-content:center; }
+  .bowl-svg svg { width:100%; height:100%; }
   .bowl-svg.shake { animation: bowl-shake 0.4s ease; }
   @keyframes bowl-shake { 0%,100%{transform:rotate(0) scale(1)} 25%{transform:rotate(-8deg) scale(1.05)} 75%{transform:rotate(8deg) scale(1.05)} }
 
@@ -159,6 +160,7 @@
 
   .oven-area { text-align:center; margin:20px 0; }
   .oven-svg { transition: filter 0.3s; }
+  .oven-svg svg { width:100%; height:100%; }
   .oven-svg.cooking { animation: oven-glow 0.5s ease infinite alternate; }
   @keyframes oven-glow { 0%{filter:brightness(1)} 100%{filter:brightness(1.4) hue-rotate(15deg)} }
 
@@ -708,11 +710,11 @@ function buildDragStage(stage, area) {
   let added = 0;
   const bowlArea = document.createElement('div');
   bowlArea.className = 'bowl-area';
-  const bowlImg = document.createElement('img');
+  const bowlImg = document.createElement('div');
   bowlImg.className = 'bowl-svg';
-  bowlImg.src = iconSrc(stage.bowlIcon);
-  bowlImg.width = 180;
-  bowlImg.height = 150;
+  bowlImg.style.width = '180px';
+  bowlImg.style.height = '150px';
+  bowlImg.innerHTML = ICONS[stage.bowlIcon] || '';
   const bowlContents = document.createElement('div');
   bowlContents.className = 'bowl-contents';
   bowlArea.appendChild(bowlContents);
@@ -800,7 +802,7 @@ function buildCookingStage(stage, area) {
       <input type="range" min="0" max="${TIME_OPTIONS.length-1}" value="0" id="time-slider">
       <div class="dial-value" id="time-value">${TIME_OPTIONS[0].label}</div>
     </div>
-    <div class="oven-area"><img class="oven-svg" id="oven-icon" src="${iconSrc('regular_oven')}" width="120" height="120"></div>
+    <div class="oven-area"><div class="oven-svg" id="oven-icon" style="width:120px;height:120px;display:inline-block;">${ICONS['regular_oven']}</div></div>
   `;
   const cookBtn = document.createElement('button');
   cookBtn.className = 'btn btn-start';
@@ -829,13 +831,13 @@ function buildCookingStage(stage, area) {
     const interval = setInterval(() => {
       i++;
       if (i < phases.length) {
-        oven.src = iconSrc(phases[i].icon);
+        oven.innerHTML = ICONS[phases[i].icon] || '';
         setCommentary(phases[i].text);
       }
       if (i >= phases.length) {
         clearInterval(interval);
         oven.classList.remove('cooking');
-        oven.src = iconSrc('explosion');
+        oven.innerHTML = ICONS['explosion'] || '';
         area.appendChild(createNextButton(nextStage));
       }
     }, 1200);
