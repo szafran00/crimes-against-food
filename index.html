@@ -893,7 +893,7 @@ function startChaosMode() {
     const item = ALL_CHAOS_ITEMS[Math.floor(Math.random() * ALL_CHAOS_ITEMS.length)];
     const el = document.createElement('div');
     el.className = 'chaos-item';
-    el.innerHTML = `<img class="icon" src="${iconSrc(item.icon)}" width="52" height="52"><span class="name">${item.name}</span>`;
+    el.innerHTML = `<div class="icon" style="width:52px;height:52px;">${ICONS[item.icon]||''}</div><span class="name">${item.name}</span>`;
 
     const startY = 20 + Math.random() * 280;
     el.style.left = '-100px';
