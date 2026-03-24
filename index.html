@@ -5,10 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Crimes Against Food</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@700&display=swap');
-
+  @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@400;700&display=swap');
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
   body {
     font-family: 'Comic Neue', cursive;
     background: #1a1a2e;
@@ -17,480 +15,303 @@
     overflow-x: hidden;
     user-select: none;
   }
+  h1,h2,h3 { font-family: 'Bangers', cursive; letter-spacing: 2px; }
 
-  h1, h2, h3 { font-family: 'Bangers', cursive; letter-spacing: 2px; }
+  .screen { display:none; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; padding:20px; }
+  .screen.active { display:flex; }
 
-  /* SCREENS */
-  .screen { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
-  .screen.active { display: flex; }
-
-  /* TITLE SCREEN */
-  #title-screen {
-    background: radial-gradient(ellipse at center, #2d1b69 0%, #1a1a2e 70%);
-    text-align: center;
-  }
+  /* TITLE */
+  #title-screen { background: radial-gradient(ellipse at center, #2d1b69 0%, #1a1a2e 70%); text-align:center; }
   #title-screen h1 {
-    font-size: clamp(3rem, 8vw, 6rem);
-    color: #ff6b6b;
+    font-size: clamp(3rem,8vw,6rem); color:#ff6b6b;
     text-shadow: 4px 4px 0 #000, 0 0 40px rgba(255,107,107,0.5);
-    margin-bottom: 10px;
-    animation: wobble 2s ease-in-out infinite;
+    margin-bottom:10px; animation: wobble 2s ease-in-out infinite;
   }
-  #title-screen .subtitle {
-    font-size: 1.4rem;
-    color: #ffd93d;
-    margin-bottom: 40px;
-  }
-  @keyframes wobble {
-    0%, 100% { transform: rotate(-1deg); }
-    50% { transform: rotate(1deg); }
-  }
+  .subtitle { font-size:1.4rem; color:#ffd93d; margin-bottom:30px; }
+  @keyframes wobble { 0%,100%{transform:rotate(-1deg)} 50%{transform:rotate(1deg)} }
 
   .btn {
-    font-family: 'Bangers', cursive;
-    font-size: 1.8rem;
-    padding: 15px 50px;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    letter-spacing: 2px;
-    transition: all 0.2s;
-    position: relative;
-    overflow: hidden;
+    font-family:'Bangers',cursive; font-size:1.8rem; padding:15px 50px;
+    border:none; border-radius:50px; cursor:pointer; letter-spacing:2px;
+    transition: all 0.2s; display:inline-block;
   }
-  .btn:hover { transform: scale(1.08); }
-  .btn:active { transform: scale(0.95); }
-  .btn-start {
-    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-    color: white;
-    box-shadow: 0 6px 20px rgba(255,107,107,0.4);
-  }
-  .btn-next {
-    background: linear-gradient(135deg, #ffd93d, #f39c12);
-    color: #333;
-    box-shadow: 0 6px 20px rgba(255,217,61,0.4);
-    font-size: 1.4rem;
-    padding: 12px 40px;
-    margin-top: 20px;
-  }
+  .btn:hover { transform:scale(1.08); }
+  .btn:active { transform:scale(0.95); }
+  .btn-start { background:linear-gradient(135deg,#ff6b6b,#ee5a24); color:white; box-shadow:0 6px 20px rgba(255,107,107,0.4); }
+  .btn-next { background:linear-gradient(135deg,#ffd93d,#f39c12); color:#333; box-shadow:0 6px 20px rgba(255,217,61,0.4); font-size:1.4rem; padding:12px 40px; margin-top:20px; }
 
-  /* GAME SCREEN */
-  #game-screen {
-    background: linear-gradient(180deg, #16213e 0%, #1a1a2e 100%);
-    padding: 20px;
-    justify-content: flex-start;
+  /* MODE SELECT */
+  #mode-screen { background: radial-gradient(ellipse at center, #2d1b69 0%, #1a1a2e 70%); text-align:center; }
+  .mode-cards { display:flex; gap:30px; flex-wrap:wrap; justify-content:center; margin-top:30px; }
+  .mode-card {
+    background:rgba(255,255,255,0.05); border:2px solid rgba(255,255,255,0.15);
+    border-radius:24px; padding:35px 30px; width:320px; cursor:pointer;
+    transition: all 0.3s; text-align:center;
   }
+  .mode-card:hover {
+    background:rgba(255,107,107,0.12); border-color:rgba(255,107,107,0.5);
+    transform:translateY(-8px); box-shadow:0 15px 40px rgba(255,107,107,0.2);
+  }
+  .mode-card h3 { font-size:1.8rem; color:#ff6b6b; margin:12px 0 8px; }
+  .mode-card p { color:#aaa; font-size:1rem; line-height:1.5; }
+  .mode-icon { font-size:4rem; }
 
-  .stage-header {
-    text-align: center;
-    margin-bottom: 10px;
-  }
-  .stage-header h2 {
-    font-size: 2.2rem;
-    color: #ff6b6b;
-    text-shadow: 2px 2px 0 #000;
-  }
-  .stage-header p {
-    color: #aaa;
-    font-size: 1.1rem;
-    margin-top: 5px;
-  }
+  /* GAME */
+  #game-screen { background:linear-gradient(180deg,#16213e 0%,#1a1a2e 100%); padding:20px; justify-content:flex-start; }
+  .stage-header { text-align:center; margin-bottom:10px; }
+  .stage-header h2 { font-size:2.2rem; color:#ff6b6b; text-shadow:2px 2px 0 #000; }
+  .stage-header p { color:#aaa; font-size:1.1rem; margin-top:5px; }
 
-  /* SCORE */
+  .top-bar { display:flex; align-items:center; gap:15px; flex-wrap:wrap; justify-content:center; margin-bottom:15px; }
   .score-bar {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 50px;
-    padding: 8px 25px;
-    margin-bottom: 15px;
-    border: 1px solid rgba(255,255,255,0.1);
+    display:flex; align-items:center; gap:15px;
+    background:rgba(255,255,255,0.05); border-radius:50px; padding:8px 25px;
+    border:1px solid rgba(255,255,255,0.1);
   }
-  .score-bar .label { color: #ffd93d; font-size: 1rem; }
-  .score-bar .value { font-family: 'Bangers', cursive; font-size: 1.6rem; color: #ff6b6b; }
-  .crime-meter {
-    width: 200px; height: 14px;
-    background: #333;
-    border-radius: 10px;
-    overflow: hidden;
-  }
-  .crime-meter-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #ffd93d, #ff6b6b, #9b59b6);
-    border-radius: 10px;
-    transition: width 0.5s ease;
-    width: 0%;
-  }
+  .score-bar .label { color:#ffd93d; font-size:1rem; }
+  .score-bar .value { font-family:'Bangers',cursive; font-size:1.6rem; color:#ff6b6b; }
+  .crime-meter { width:200px; height:14px; background:#333; border-radius:10px; overflow:hidden; }
+  .crime-meter-fill { height:100%; background:linear-gradient(90deg,#ffd93d,#ff6b6b,#9b59b6); border-radius:10px; transition:width 0.5s; width:0%; }
 
-  /* CONVEYOR / INGREDIENT AREA */
-  .game-area {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    max-width: 900px;
-    gap: 20px;
+  .music-btn {
+    background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2);
+    border-radius:50%; width:42px; height:42px; font-size:1.3rem; cursor:pointer;
+    color:#eee; transition:all 0.2s; display:flex; align-items:center; justify-content:center;
   }
+  .music-btn:hover { background:rgba(255,255,255,0.15); }
+
+  .game-area { display:flex; flex-direction:column; align-items:center; width:100%; max-width:900px; gap:20px; }
 
   .conveyor {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    justify-content: center;
-    padding: 20px;
-    background: rgba(255,255,255,0.03);
-    border-radius: 20px;
-    border: 2px dashed rgba(255,255,255,0.1);
-    min-height: 120px;
-    width: 100%;
+    display:flex; flex-wrap:wrap; gap:12px; justify-content:center; padding:20px;
+    background:rgba(255,255,255,0.03); border-radius:20px;
+    border:2px dashed rgba(255,255,255,0.1); min-height:120px; width:100%;
   }
 
+  /* Ingredients - ALL same style, no color tell */
   .ingredient {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    padding: 12px 16px;
-    border-radius: 16px;
-    cursor: grab;
-    transition: all 0.2s;
-    font-size: 0.85rem;
-    text-align: center;
-    width: 110px;
-    position: relative;
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    padding:12px 14px; border-radius:16px; cursor:grab; transition:all 0.2s;
+    font-size:0.85rem; text-align:center; width:115px;
+    background:rgba(255,255,255,0.06); border:2px solid rgba(255,255,255,0.12);
   }
-  .ingredient:active { cursor: grabbing; }
-  .ingredient.bad {
-    background: rgba(255,107,107,0.15);
-    border: 2px solid rgba(255,107,107,0.3);
+  .ingredient:hover {
+    background:rgba(255,255,255,0.12); transform:scale(1.08);
+    box-shadow:0 4px 20px rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.25);
   }
-  .ingredient.bad:hover {
-    background: rgba(255,107,107,0.25);
-    transform: scale(1.1);
-    box-shadow: 0 4px 20px rgba(255,107,107,0.3);
-  }
-  .ingredient.good {
-    background: rgba(46,213,115,0.15);
-    border: 2px solid rgba(46,213,115,0.3);
-  }
-  .ingredient.good:hover {
-    background: rgba(46,213,115,0.25);
-    transform: scale(1.1);
-  }
-  .ingredient .emoji {
-    font-size: 2.8rem;
-    line-height: 1;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-  }
-  .ingredient .name { font-weight: 700; line-height: 1.2; }
+  .ingredient:active { cursor:grabbing; transform:scale(0.95); }
+  .ingredient .icon { width:64px; height:64px; }
+  .ingredient .name { font-weight:700; line-height:1.2; color:#ddd; }
+  .ingredient.added { opacity:0.2; pointer-events:none; transform:scale(0.8); }
 
-  .ingredient.added {
-    opacity: 0.3;
-    pointer-events: none;
-    transform: scale(0.8);
-  }
-
-  /* BOWL */
-  .bowl-area {
-    position: relative;
-    width: 280px;
-    height: 200px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .bowl {
-    font-size: 10rem;
-    filter: drop-shadow(0 10px 30px rgba(0,0,0,0.5));
-    transition: transform 0.3s;
-    line-height: 1;
-  }
-  .bowl.shake {
-    animation: bowl-shake 0.4s ease;
-  }
-  @keyframes bowl-shake {
-    0%, 100% { transform: rotate(0) scale(1); }
-    25% { transform: rotate(-8deg) scale(1.05); }
-    75% { transform: rotate(8deg) scale(1.05); }
-  }
+  .bowl-area { position:relative; width:280px; height:200px; display:flex; align-items:center; justify-content:center; }
+  .bowl-svg { filter:drop-shadow(0 10px 30px rgba(0,0,0,0.5)); transition:transform 0.3s; }
+  .bowl-svg.shake { animation: bowl-shake 0.4s ease; }
+  @keyframes bowl-shake { 0%,100%{transform:rotate(0) scale(1)} 25%{transform:rotate(-8deg) scale(1.05)} 75%{transform:rotate(8deg) scale(1.05)} }
 
   .bowl-contents {
-    position: absolute;
-    top: 10px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2px;
-    justify-content: center;
-    width: 140px;
-    pointer-events: none;
+    position:absolute; top:15px; display:flex; flex-wrap:wrap; gap:3px;
+    justify-content:center; width:140px; pointer-events:none;
   }
-  .bowl-contents .mini-emoji {
-    font-size: 1.6rem;
-    animation: pop-in 0.3s ease;
-  }
-  @keyframes pop-in {
-    0% { transform: scale(0) rotate(180deg); opacity: 0; }
-    100% { transform: scale(1) rotate(0); opacity: 1; }
-  }
+  .bowl-contents .mini-icon { width:28px; height:28px; animation: pop-in 0.3s ease; }
+  @keyframes pop-in { 0%{transform:scale(0) rotate(180deg);opacity:0} 100%{transform:scale(1) rotate(0);opacity:1} }
 
-  /* PENALTY FLASH */
-  .penalty-flash {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-family: 'Bangers', cursive;
-    font-size: 3rem;
-    color: #2ecc71;
-    text-shadow: 2px 2px 0 #000;
-    pointer-events: none;
-    animation: flash-up 1s ease forwards;
-    z-index: 100;
+  .flash-text {
+    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+    font-family:'Bangers',cursive; font-size:3rem; pointer-events:none;
+    animation: flash-up 1s ease forwards; z-index:100;
+    text-shadow:2px 2px 0 #000;
   }
-  .penalty-flash.bad {
-    color: #ff6b6b;
-  }
-  @keyframes flash-up {
-    0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
-    30% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
-    100% { opacity: 0; transform: translate(-50%, -60%) scale(1); }
-  }
+  .flash-good { color:#ffd93d; }
+  .flash-bad { color:#ff6b6b; }
+  @keyframes flash-up { 0%{opacity:1;transform:translate(-50%,-50%) scale(0.5)} 30%{opacity:1;transform:translate(-50%,-50%) scale(1.2)} 100%{opacity:0;transform:translate(-50%,-60%) scale(1)} }
 
-  /* CHOICE STAGE */
-  .choices {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-    width: 100%;
-    max-width: 800px;
-  }
+  .choices { display:flex; flex-wrap:wrap; gap:20px; justify-content:center; width:100%; max-width:800px; }
   .choice-card {
-    background: rgba(255,255,255,0.05);
-    border: 2px solid rgba(255,255,255,0.1);
-    border-radius: 20px;
-    padding: 25px 20px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    width: 220px;
+    background:rgba(255,255,255,0.05); border:2px solid rgba(255,255,255,0.12);
+    border-radius:20px; padding:25px 20px; text-align:center; cursor:pointer;
+    transition:all 0.2s; width:220px;
   }
   .choice-card:hover {
-    background: rgba(255,107,107,0.15);
-    border-color: rgba(255,107,107,0.4);
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(255,107,107,0.2);
+    background:rgba(255,107,107,0.15); border-color:rgba(255,107,107,0.4);
+    transform:translateY(-5px); box-shadow:0 10px 30px rgba(255,107,107,0.2);
   }
-  .choice-card .emoji { font-size: 4rem; margin-bottom: 10px; }
-  .choice-card .name { font-size: 1.2rem; font-weight: 700; color: #ffd93d; }
-  .choice-card .desc { font-size: 0.9rem; color: #aaa; margin-top: 6px; }
+  .choice-card .icon { margin-bottom:10px; }
+  .choice-card .name { font-size:1.2rem; font-weight:700; color:#ffd93d; }
+  .choice-card .desc { font-size:0.9rem; color:#aaa; margin-top:6px; }
 
-  /* COOKING STAGE */
-  .cooking-controls {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 25px;
-    width: 100%;
-    max-width: 500px;
-  }
-  .dial {
-    text-align: center;
-    width: 100%;
-  }
-  .dial label {
-    display: block;
-    font-size: 1.2rem;
-    color: #ffd93d;
-    margin-bottom: 8px;
-    font-weight: 700;
-  }
+  .cooking-controls { display:flex; flex-direction:column; align-items:center; gap:25px; width:100%; max-width:500px; }
+  .dial { text-align:center; width:100%; }
+  .dial label { display:block; font-size:1.2rem; color:#ffd93d; margin-bottom:8px; font-weight:700; }
   .dial input[type="range"] {
-    width: 100%;
-    height: 12px;
-    -webkit-appearance: none;
-    appearance: none;
-    background: linear-gradient(90deg, #2ecc71, #ffd93d, #ff6b6b, #9b59b6);
-    border-radius: 10px;
-    outline: none;
+    width:100%; height:12px; -webkit-appearance:none; appearance:none;
+    background:linear-gradient(90deg,#2ecc71,#ffd93d,#ff6b6b,#9b59b6);
+    border-radius:10px; outline:none;
   }
   .dial input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: white;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    cursor: pointer;
+    -webkit-appearance:none; width:28px; height:28px; border-radius:50%;
+    background:white; box-shadow:0 2px 10px rgba(0,0,0,0.3); cursor:pointer;
   }
-  .dial .dial-value {
-    font-family: 'Bangers', cursive;
-    font-size: 1.5rem;
-    color: #ff6b6b;
-    margin-top: 6px;
-  }
+  .dial .dial-value { font-family:'Bangers',cursive; font-size:1.5rem; color:#ff6b6b; margin-top:6px; }
 
-  /* OVEN ANIMATION */
-  .oven-area {
-    text-align: center;
-    margin: 20px 0;
-  }
-  .oven-emoji {
-    font-size: 8rem;
-    display: inline-block;
-  }
-  .oven-emoji.cooking {
-    animation: oven-glow 0.5s ease infinite alternate;
-  }
-  @keyframes oven-glow {
-    0% { filter: brightness(1); }
-    100% { filter: brightness(1.3) hue-rotate(10deg); }
-  }
+  .oven-area { text-align:center; margin:20px 0; }
+  .oven-svg { transition: filter 0.3s; }
+  .oven-svg.cooking { animation: oven-glow 0.5s ease infinite alternate; }
+  @keyframes oven-glow { 0%{filter:brightness(1)} 100%{filter:brightness(1.4) hue-rotate(15deg)} }
 
-  /* RESULT SCREEN */
-  #result-screen {
-    background: radial-gradient(ellipse at center, #2d1b69 0%, #1a1a2e 70%);
-    text-align: center;
-  }
-
-  .certificate {
-    background: linear-gradient(135deg, #1e1e3a, #2d1b69);
-    border: 3px solid #ffd93d;
-    border-radius: 20px;
-    padding: 40px 50px;
-    max-width: 550px;
-    width: 90%;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 0 60px rgba(255,217,61,0.05);
-    position: relative;
-  }
-  .certificate::before {
-    content: '🚨';
-    position: absolute;
-    top: -25px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 3rem;
-  }
-  .certificate h2 {
-    font-size: 2.5rem;
-    color: #ff6b6b;
-    text-shadow: 2px 2px 0 #000;
-    margin-bottom: 5px;
-  }
-  .certificate .crime-title {
-    font-family: 'Bangers', cursive;
-    font-size: 1.8rem;
-    color: #ffd93d;
-    margin: 10px 0;
-  }
-  .certificate .final-pizza {
-    font-size: 6rem;
-    margin: 15px 0;
-    position: relative;
-    display: inline-block;
-  }
-  .certificate .final-pizza::after {
-    content: '☠️';
-    position: absolute;
-    top: -10px;
-    right: -20px;
-    font-size: 2rem;
-  }
-  .certificate .stats {
-    text-align: left;
-    margin: 15px 0;
-    padding: 15px;
-    background: rgba(0,0,0,0.3);
-    border-radius: 12px;
-  }
-  .certificate .stats div {
-    padding: 4px 0;
-    font-size: 1rem;
-    display: flex;
-    justify-content: space-between;
-  }
-  .certificate .stats .stat-label { color: #aaa; }
-  .certificate .stats .stat-value { color: #ffd93d; font-weight: 700; }
-
-  .rank {
-    font-family: 'Bangers', cursive;
-    font-size: 2rem;
-    margin-top: 15px;
-    padding: 10px 30px;
-    border-radius: 50px;
-    display: inline-block;
-  }
-  .rank-s { background: linear-gradient(135deg, #9b59b6, #8e44ad); color: #fff; box-shadow: 0 0 30px rgba(155,89,182,0.5); }
-  .rank-a { background: linear-gradient(135deg, #ff6b6b, #ee5a24); color: #fff; }
-  .rank-b { background: linear-gradient(135deg, #ffd93d, #f39c12); color: #333; }
-  .rank-c { background: linear-gradient(135deg, #2ecc71, #27ae60); color: #fff; }
-
-  .btn-row { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
-  .btn-small {
-    font-family: 'Bangers', cursive;
-    font-size: 1.2rem;
-    padding: 10px 30px;
-    border: 2px solid rgba(255,255,255,0.2);
-    border-radius: 50px;
-    background: rgba(255,255,255,0.05);
-    color: #eee;
-    cursor: pointer;
-    transition: all 0.2s;
-    letter-spacing: 1px;
-  }
-  .btn-small:hover {
-    background: rgba(255,255,255,0.15);
-    border-color: rgba(255,255,255,0.4);
-    transform: scale(1.05);
-  }
-
-  /* Commentary */
   .commentary {
-    background: rgba(255,217,61,0.1);
-    border-left: 4px solid #ffd93d;
-    padding: 12px 18px;
-    border-radius: 0 12px 12px 0;
-    margin: 10px 0;
-    font-size: 1rem;
-    color: #ffd93d;
-    max-width: 600px;
-    text-align: center;
-    min-height: 50px;
-    transition: opacity 0.3s;
+    background:rgba(255,217,61,0.1); border-left:4px solid #ffd93d;
+    padding:12px 18px; border-radius:0 12px 12px 0; margin:10px 0;
+    font-size:1rem; color:#ffd93d; max-width:600px; text-align:center;
+    min-height:50px; transition:opacity 0.3s;
   }
 
-  /* Responsive */
-  @media (max-width: 600px) {
-    .ingredient { width: 90px; padding: 8px 10px; }
-    .ingredient .emoji { font-size: 2.2rem; }
-    .ingredient .name { font-size: 0.75rem; }
-    .choice-card { width: 160px; padding: 15px; }
-    .certificate { padding: 25px 20px; }
+  /* CHAOS MODE */
+  .chaos-arena {
+    position:relative; width:100%; max-width:900px; height:420px;
+    background:rgba(255,255,255,0.02); border-radius:20px;
+    border:2px solid rgba(255,255,255,0.08); overflow:hidden;
+  }
+  .chaos-belt {
+    position:absolute; bottom:0; left:0; right:0; height:8px;
+    background:repeating-linear-gradient(90deg,#444 0,#444 20px,#333 20px,#333 40px);
+    animation: belt-move 1s linear infinite;
+  }
+  @keyframes belt-move { 0%{background-position:0 0} 100%{background-position:40px 0} }
+  .chaos-item {
+    position:absolute; width:90px; display:flex; flex-direction:column;
+    align-items:center; gap:4px; cursor:pointer; transition: transform 0.1s;
+    padding:8px; border-radius:12px; background:rgba(255,255,255,0.06);
+    border:2px solid rgba(255,255,255,0.12);
+  }
+  .chaos-item:hover { transform:scale(1.1); background:rgba(255,255,255,0.12); }
+  .chaos-item .icon { width:52px; height:52px; }
+  .chaos-item .name { font-size:0.7rem; font-weight:700; color:#ddd; text-align:center; line-height:1.1; }
+  .chaos-timer {
+    font-family:'Bangers',cursive; font-size:2rem; color:#ff6b6b;
+    background:rgba(0,0,0,0.5); padding:5px 20px; border-radius:50px;
+  }
+  .chaos-hud { display:flex; align-items:center; gap:20px; margin-bottom:15px; flex-wrap:wrap; justify-content:center; }
+  .chaos-caught {
+    display:flex; gap:4px; flex-wrap:wrap; max-width:300px; min-height:40px;
+    background:rgba(255,255,255,0.03); border-radius:12px; padding:6px 10px;
+    align-items:center;
+  }
+  .chaos-caught img { width:28px; height:28px; animation: pop-in 0.3s ease; }
+
+  /* RESULT */
+  #result-screen { background:radial-gradient(ellipse at center,#2d1b69 0%,#1a1a2e 70%); text-align:center; }
+  .certificate {
+    background:linear-gradient(135deg,#1e1e3a,#2d1b69); border:3px solid #ffd93d;
+    border-radius:20px; padding:40px 50px; max-width:550px; width:90%;
+    box-shadow:0 20px 60px rgba(0,0,0,0.5),inset 0 0 60px rgba(255,217,61,0.05);
+    position:relative;
+  }
+  .certificate h2 { font-size:2.5rem; color:#ff6b6b; text-shadow:2px 2px 0 #000; margin-bottom:5px; }
+  .crime-title { font-family:'Bangers',cursive; font-size:1.8rem; color:#ffd93d; margin:10px 0; }
+  .final-pizza-wrap { margin:20px 0; }
+  .stats {
+    text-align:left; margin:15px 0; padding:15px;
+    background:rgba(0,0,0,0.3); border-radius:12px;
+  }
+  .stats div { padding:4px 0; font-size:1rem; display:flex; justify-content:space-between; }
+  .stats .stat-label { color:#aaa; }
+  .stats .stat-value { color:#ffd93d; font-weight:700; }
+  .rank {
+    font-family:'Bangers',cursive; font-size:2rem; margin-top:15px;
+    padding:10px 30px; border-radius:50px; display:inline-block;
+  }
+  .rank-s { background:linear-gradient(135deg,#9b59b6,#8e44ad); color:#fff; box-shadow:0 0 30px rgba(155,89,182,0.5); }
+  .rank-a { background:linear-gradient(135deg,#ff6b6b,#ee5a24); color:#fff; }
+  .rank-b { background:linear-gradient(135deg,#ffd93d,#f39c12); color:#333; }
+  .rank-c { background:linear-gradient(135deg,#2ecc71,#27ae60); color:#fff; }
+  .btn-row { display:flex; gap:15px; margin-top:20px; flex-wrap:wrap; justify-content:center; }
+  .btn-small {
+    font-family:'Bangers',cursive; font-size:1.2rem; padding:10px 30px;
+    border:2px solid rgba(255,255,255,0.2); border-radius:50px;
+    background:rgba(255,255,255,0.05); color:#eee; cursor:pointer;
+    transition:all 0.2s; letter-spacing:1px;
+  }
+  .btn-small:hover { background:rgba(255,255,255,0.15); border-color:rgba(255,255,255,0.4); transform:scale(1.05); }
+
+  @media(max-width:600px) {
+    .ingredient { width:90px; padding:8px; }
+    .ingredient .icon { width:48px; height:48px; }
+    .choice-card { width:160px; padding:15px; }
+    .certificate { padding:25px 20px; }
+    .chaos-arena { height:350px; }
   }
 </style>
 </head>
 <body>
 
-<!-- TITLE SCREEN -->
+<!-- TITLE -->
 <div id="title-screen" class="screen active">
   <h1>CRIMES AGAINST FOOD</h1>
   <p class="subtitle">A pizza-making disaster simulator</p>
-  <div style="font-size: 5rem; margin: 20px 0;">🍕🔥💀</div>
-  <p style="color: #aaa; max-width: 450px; text-align:center; margin-bottom: 30px; line-height: 1.6;">
+  <div style="font-size:5rem;margin:20px 0;">
+    <svg width="120" height="120" viewBox="0 0 120 120">
+      <path d="M60 10 L110 100 L10 100 Z" fill="#f4a430" stroke="#c78420" stroke-width="3"/>
+      <circle cx="45" cy="70" r="8" fill="#e74c3c"/><circle cx="70" cy="60" r="6" fill="#27ae60"/>
+      <circle cx="55" cy="85" r="5" fill="#8e44ad"/><circle cx="80" cy="80" r="7" fill="#e74c3c"/>
+      <circle cx="38" cy="55" r="4" fill="#f39c12"/>
+      <text x="60" y="48" text-anchor="middle" font-size="20">☠️</text>
+    </svg>
+  </div>
+  <p style="color:#aaa;max-width:450px;text-align:center;margin-bottom:30px;line-height:1.6;">
     Your mission: make the <strong style="color:#ff6b6b">worst pizza in human history</strong>.<br>
     Pick terrible ingredients. Reject anything sensible.<br>
-    The kitchen is yours. The Geneva Convention does not apply here.
+    The Geneva Convention does not apply here.
   </p>
-  <button class="btn btn-start" onclick="startGame()">BEGIN THE CRIME</button>
+  <button class="btn btn-start" onclick="showModeSelect()">BEGIN THE CRIME</button>
 </div>
 
-<!-- GAME SCREEN -->
+<!-- MODE SELECT -->
+<div id="mode-screen" class="screen">
+  <h2 style="font-size:2.5rem;color:#ff6b6b;text-shadow:2px 2px 0 #000;">CHOOSE YOUR CRIME</h2>
+  <p style="color:#aaa;margin-top:10px;font-size:1.1rem;">How would you like to ruin pizza today?</p>
+  <div class="mode-cards">
+    <div class="mode-card" onclick="startGame('classic')">
+      <div class="mode-icon">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <rect x="10" y="30" width="60" height="40" rx="8" fill="#555" stroke="#777" stroke-width="2"/>
+          <rect x="15" y="35" width="50" height="30" rx="4" fill="#333"/>
+          <circle cx="40" cy="50" r="10" fill="#f4a430" opacity="0.7"/>
+          <line x1="25" y1="25" x2="25" y2="30" stroke="#777" stroke-width="2"/>
+          <line x1="55" y1="25" x2="55" y2="30" stroke="#777" stroke-width="2"/>
+          <rect x="22" y="18" width="36" height="8" rx="3" fill="#666"/>
+        </svg>
+      </div>
+      <h3>CLASSIC CRIME</h3>
+      <p>Step-by-step pizza destruction. Choose ingredients, mixing method, toppings, oven, and cooking time at your own pace.</p>
+    </div>
+    <div class="mode-card" onclick="startGame('chaos')">
+      <div class="mode-icon">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <rect x="5" y="55" width="70" height="10" rx="3" fill="#555"/>
+          <rect x="0" y="58" width="80" height="4" fill="#444"/>
+          <circle cx="15" cy="40" r="12" fill="#e74c3c" opacity="0.8"/>
+          <circle cx="40" cy="30" r="10" fill="#f39c12" opacity="0.8"/>
+          <circle cx="62" cy="38" r="11" fill="#9b59b6" opacity="0.8"/>
+          <path d="M70 35 L80 20" stroke="#ff6b6b" stroke-width="2" stroke-dasharray="4"/>
+          <text x="75" y="18" font-size="12" fill="#ff6b6b">!</text>
+        </svg>
+      </div>
+      <h3>CHAOS KITCHEN</h3>
+      <p>Ingredients fly across a conveyor belt! Grab the terrible ones, dodge the normal ones. 60 seconds of pure chaos.</p>
+    </div>
+  </div>
+</div>
+
+<!-- GAME -->
 <div id="game-screen" class="screen">
-  <div class="score-bar">
-    <span class="label">CRIME SCORE:</span>
-    <span class="value" id="score-display">0</span>
-    <div class="crime-meter"><div class="crime-meter-fill" id="crime-meter"></div></div>
+  <div class="top-bar">
+    <div class="score-bar">
+      <span class="label">CRIME SCORE:</span>
+      <span class="value" id="score-display">0</span>
+      <div class="crime-meter"><div class="crime-meter-fill" id="crime-meter"></div></div>
+    </div>
+    <button class="music-btn" id="music-btn" onclick="toggleMusic()" title="Toggle music">🔇</button>
   </div>
   <div class="stage-header">
     <h2 id="stage-title"></h2>
@@ -500,7 +321,7 @@
   <div class="game-area" id="game-area"></div>
 </div>
 
-<!-- RESULT SCREEN -->
+<!-- RESULT -->
 <div id="result-screen" class="screen">
   <div class="certificate" id="certificate"></div>
   <div class="btn-row">
@@ -509,142 +330,239 @@
 </div>
 
 <script>
-// ============ GAME STATE ============
-let score = 0;
-let maxScore = 0;
-let currentStage = 0;
-let chosenItems = [];
-let stageResults = {};
+// ═══════════════════════════════════════
+// SVG IMAGE GENERATOR
+// ═══════════════════════════════════════
+const ICONS = {
+  // Dough stage - bad
+  uranium: `<svg viewBox="0 0 64 64"><rect x="16" y="20" width="32" height="36" rx="4" fill="#4a4" stroke="#2d6a2d" stroke-width="2"/><rect x="14" y="16" width="36" height="8" rx="3" fill="#5b5"/><text x="32" y="46" text-anchor="middle" font-size="18" font-weight="bold" fill="#1a3a1a">☢</text><circle cx="32" cy="10" r="6" fill="#7f7" opacity="0.5"><animate attributeName="r" values="6;10;6" dur="1.5s" repeatCount="indefinite"/></circle></svg>`,
+  ostrich_egg: `<svg viewBox="0 0 64 64"><ellipse cx="32" cy="36" rx="20" ry="24" fill="#f5e6c8" stroke="#d4c4a0" stroke-width="2"/><ellipse cx="32" cy="30" rx="16" ry="18" fill="#faf0dc" opacity="0.5"/><text x="32" y="58" text-anchor="middle" font-size="8" fill="#999" font-weight="bold">×47</text></svg>`,
+  choc_milk: `<svg viewBox="0 0 64 64"><rect x="18" y="12" width="28" height="44" rx="4" fill="#6b3a2a" stroke="#4a2818" stroke-width="2"/><rect x="20" y="14" width="24" height="10" rx="2" fill="#8b5a3a"/><rect x="22" y="28" width="20" height="20" rx="2" fill="#4a2818" opacity="0.3"/><text x="32" y="42" text-anchor="middle" font-size="7" fill="#d4a574" font-weight="bold">15L</text><rect x="28" y="8" width="8" height="6" rx="2" fill="#8b5a3a"/></svg>`,
+  flying_butter: `<svg viewBox="0 0 64 64"><rect x="14" y="28" width="36" height="18" rx="4" fill="#ffd93d" stroke="#d4a520" stroke-width="2"/><rect x="16" y="30" width="32" height="6" rx="2" fill="#ffe566" opacity="0.6"/><path d="M10 28 Q6 20 16 22" fill="#fff" opacity="0.6"/><path d="M54 28 Q58 20 48 22" fill="#fff" opacity="0.6"/><path d="M6 22 Q2 14 14 18" fill="#fff" opacity="0.4"/><path d="M58 22 Q62 14 50 18" fill="#fff" opacity="0.4"/><animate attributeName="opacity" values="1;0.8;1" dur="0.5s" repeatCount="indefinite"/></svg>`,
+  brick_dust: `<svg viewBox="0 0 64 64"><rect x="12" y="22" width="40" height="32" rx="2" fill="#c9a87c" stroke="#a08060" stroke-width="2"/><rect x="16" y="14" width="32" height="10" rx="2" fill="#d4b48c"/><rect x="18" y="30" width="12" height="8" rx="1" fill="#c0522d"/><rect x="34" y="30" width="12" height="8" rx="1" fill="#c0522d"/><rect x="26" y="40" width="12" height="8" rx="1" fill="#c0522d"/></svg>`,
+  dentures: `<svg viewBox="0 0 64 64"><path d="M12 36 Q32 52 52 36" fill="#ffb3b3" stroke="#cc8080" stroke-width="2"/><path d="M12 36 Q32 20 52 36" fill="#ffb3b3" stroke="#cc8080" stroke-width="2"/><rect x="18" y="30" width="5" height="8" rx="1" fill="white" stroke="#ddd" stroke-width="1"/><rect x="25" y="29" width="5" height="9" rx="1" fill="white" stroke="#ddd" stroke-width="1"/><rect x="32" y="29" width="5" height="9" rx="1" fill="white" stroke="#ddd" stroke-width="1"/><rect x="39" y="30" width="5" height="8" rx="1" fill="white" stroke="#ddd" stroke-width="1"/></svg>`,
+  gravel: `<svg viewBox="0 0 64 64"><circle cx="20" cy="40" r="8" fill="#888" stroke="#666" stroke-width="2"/><circle cx="38" cy="44" r="6" fill="#999" stroke="#777" stroke-width="2"/><circle cx="44" cy="32" r="7" fill="#777" stroke="#555" stroke-width="2"/><circle cx="26" cy="28" r="5" fill="#aaa" stroke="#888" stroke-width="2"/><circle cx="16" cy="50" r="4" fill="#999"/><text x="32" y="16" text-anchor="middle" font-size="7" fill="#aaa" font-style="italic">artisan</text></svg>`,
+  lava: `<svg viewBox="0 0 64 64"><ellipse cx="32" cy="42" rx="22" ry="16" fill="#e74c3c"/><ellipse cx="32" cy="38" rx="18" ry="12" fill="#f39c12"/><ellipse cx="32" cy="35" rx="12" ry="8" fill="#ffd93d"/><circle cx="24" cy="40" r="3" fill="#ffd93d" opacity="0.7"><animate attributeName="cy" values="40;36;40" dur="1s" repeatCount="indefinite"/></circle><circle cx="40" cy="38" r="2" fill="#fff" opacity="0.5"><animate attributeName="cy" values="38;34;38" dur="0.8s" repeatCount="indefinite"/></circle></svg>`,
+  // Dough stage - good (traps)
+  flour: `<svg viewBox="0 0 64 64"><rect x="14" y="18" width="36" height="38" rx="3" fill="#f5f5f0" stroke="#ddd" stroke-width="2"/><rect x="18" y="24" width="28" height="14" rx="2" fill="#e8e4d8"/><text x="32" y="35" text-anchor="middle" font-size="8" fill="#888" font-weight="bold">FLOUR</text><text x="32" y="50" text-anchor="middle" font-size="6" fill="#aaa">plain</text></svg>`,
+  water: `<svg viewBox="0 0 64 64"><path d="M18 16 L14 52 Q14 56 18 56 L46 56 Q50 56 50 52 L46 16 Z" fill="#d4eaf7" stroke="#a0c4e0" stroke-width="2"/><rect x="18" y="30" width="28" height="24" rx="0" fill="#7fb8e0" opacity="0.5"/><ellipse cx="32" cy="30" rx="14" ry="2" fill="#7fb8e0" opacity="0.7"/></svg>`,
+  salt: `<svg viewBox="0 0 64 64"><rect x="20" y="20" width="24" height="36" rx="4" fill="#f5f5f5" stroke="#ddd" stroke-width="2"/><rect x="20" y="16" width="24" height="8" rx="4" fill="#ddd"/><circle cx="28" cy="18" r="1.5" fill="#bbb"/><circle cx="32" cy="20" r="1.5" fill="#bbb"/><circle cx="36" cy="18" r="1.5" fill="#bbb"/><text x="32" y="44" text-anchor="middle" font-size="8" fill="#999" font-weight="bold">SALT</text></svg>`,
+  milk: `<svg viewBox="0 0 64 64"><rect x="18" y="14" width="28" height="42" rx="3" fill="#fff" stroke="#ddd" stroke-width="2"/><rect x="18" y="14" width="28" height="12" rx="3" fill="#4a90d9"/><text x="32" y="24" text-anchor="middle" font-size="7" fill="white" font-weight="bold">MILK</text><rect x="26" y="8" width="12" height="8" rx="2" fill="#eee" stroke="#ddd" stroke-width="1"/></svg>`,
+  // Toppings - bad
+  ancient_sauce: `<svg viewBox="0 0 64 64"><path d="M22 20 Q20 56 24 56 L40 56 Q44 56 42 20 Z" fill="#8b6914" stroke="#6b4f10" stroke-width="2"/><ellipse cx="32" cy="20" rx="10" ry="4" fill="#a07818"/><path d="M24 30 Q32 26 40 30" stroke="#6b4f10" stroke-width="1" fill="none"/><text x="32" y="48" text-anchor="middle" font-size="6" fill="#d4a520" font-weight="bold">562 AD</text><circle cx="38" cy="24" r="2" fill="#4a4" opacity="0.6"/></svg>`,
+  uranium2: `<svg viewBox="0 0 64 64"><rect x="16" y="20" width="32" height="36" rx="4" fill="#5a5" stroke="#3d7a3d" stroke-width="2"/><rect x="14" y="16" width="36" height="8" rx="3" fill="#6b6"/><text x="32" y="46" text-anchor="middle" font-size="18" font-weight="bold" fill="#2a4a2a">☢</text><text x="32" y="14" text-anchor="middle" font-size="6" fill="#afa">EXTRA</text><circle cx="32" cy="10" r="5" fill="#8f8" opacity="0.4"><animate attributeName="r" values="5;8;5" dur="1.2s" repeatCount="indefinite"/></circle></svg>`,
+  socks: `<svg viewBox="0 0 64 64"><path d="M22 10 L22 40 Q22 54 36 54 L42 54 Q52 54 52 44 L52 40 Q52 34 42 34 L32 34 L32 10 Z" fill="#8866aa" stroke="#664488" stroke-width="2"/><path d="M22 10 L32 10" stroke="#9977bb" stroke-width="4" stroke-linecap="round"/><line x1="24" y1="18" x2="30" y2="18" stroke="#9977bb" stroke-width="1.5"/><line x1="24" y1="22" x2="30" y2="22" stroke="#9977bb" stroke-width="1.5"/><circle cx="40" cy="44" r="2" fill="#664488" opacity="0.4"/></svg>`,
+  jellyfish: `<svg viewBox="0 0 64 64"><ellipse cx="32" cy="24" rx="18" ry="14" fill="#c4a0e8" stroke="#a080c8" stroke-width="2" opacity="0.8"/><ellipse cx="32" cy="22" rx="14" ry="10" fill="#d8b8f0" opacity="0.5"/><path d="M18 30 Q20 50 22 46" stroke="#c4a0e8" stroke-width="2" fill="none"/><path d="M26 32 Q28 54 30 48" stroke="#c4a0e8" stroke-width="2" fill="none"/><path d="M34 32 Q36 54 38 48" stroke="#c4a0e8" stroke-width="2" fill="none"/><path d="M42 30 Q44 50 46 46" stroke="#c4a0e8" stroke-width="2" fill="none"/><circle cx="26" cy="22" r="2" fill="#333"/><circle cx="38" cy="22" r="2" fill="#333"/></svg>`,
+  paperclips: `<svg viewBox="0 0 64 64"><path d="M20 18 L20 42 Q20 48 26 48 L26 24 Q26 18 32 18 L32 48" stroke="#c0c0c0" stroke-width="3" fill="none"/><path d="M34 14 L34 44 Q34 50 40 50 L40 20 Q40 14 46 14 L46 48" stroke="#d4a520" stroke-width="3" fill="none"/><path d="M12 24 L12 38 Q12 42 16 42 L16 28 Q16 24 20 24" stroke="#e74c3c" stroke-width="2.5" fill="none"/><text x="32" y="60" text-anchor="middle" font-size="6" fill="#999" font-weight="bold">×1000</text></svg>`,
+  soap: `<svg viewBox="0 0 64 64"><circle cx="20" cy="20" r="8" fill="none" stroke="#88ccff" stroke-width="1.5" opacity="0.7"/><circle cx="40" cy="16" r="10" fill="none" stroke="#88ccff" stroke-width="1.5" opacity="0.6"/><circle cx="30" cy="34" r="12" fill="none" stroke="#88ccff" stroke-width="1.5" opacity="0.8"/><circle cx="46" cy="38" r="7" fill="none" stroke="#88ccff" stroke-width="1.5" opacity="0.5"/><circle cx="18" cy="46" r="9" fill="none" stroke="#88ccff" stroke-width="1.5" opacity="0.6"/><circle cx="40" cy="50" r="6" fill="none" stroke="#88ccff" stroke-width="1.5" opacity="0.4"/><circle cx="30" cy="34" r="4" fill="#88ccff" opacity="0.15"/></svg>`,
+  disco_ball: `<svg viewBox="0 0 64 64"><circle cx="32" cy="34" r="18" fill="#888" stroke="#aaa" stroke-width="2"/><line x1="32" y1="6" x2="32" y2="16" stroke="#aaa" stroke-width="2"/><rect x="14" y="28" width="36" height="2" fill="#bbb" opacity="0.4"/><rect x="14" y="34" width="36" height="2" fill="#bbb" opacity="0.4"/><rect x="14" y="40" width="36" height="2" fill="#bbb" opacity="0.4"/><rect x="30" y="16" width="2" height="36" fill="#bbb" opacity="0.3" rx="1"/><rect x="22" y="16" width="2" height="36" fill="#bbb" opacity="0.3" rx="1"/><rect x="38" y="16" width="2" height="36" fill="#bbb" opacity="0.3" rx="1"/><circle cx="22" cy="12" r="3" fill="#ffd93d" opacity="0.6"><animate attributeName="opacity" values="0.6;0.2;0.6" dur="0.8s" repeatCount="indefinite"/></circle><circle cx="46" cy="20" r="2" fill="#ff6b6b" opacity="0.6"><animate attributeName="opacity" values="0.2;0.6;0.2" dur="0.7s" repeatCount="indefinite"/></circle></svg>`,
+  hedgehog: `<svg viewBox="0 0 64 64"><ellipse cx="32" cy="40" rx="20" ry="14" fill="#c8a882" stroke="#a08860" stroke-width="2"/><line x1="18" y1="32" x2="14" y2="22" stroke="#8b7355" stroke-width="2"/><line x1="24" y1="28" x2="22" y2="18" stroke="#8b7355" stroke-width="2"/><line x1="32" y1="26" x2="32" y2="16" stroke="#8b7355" stroke-width="2"/><line x1="40" y1="28" x2="42" y2="18" stroke="#8b7355" stroke-width="2"/><line x1="46" y1="32" x2="50" y2="22" stroke="#8b7355" stroke-width="2"/><circle cx="24" cy="38" r="2" fill="#333"/><circle cx="32" cy="42" r="2.5" fill="#333"/><text x="32" y="58" text-anchor="middle" font-size="5" fill="#999" font-style="italic">rubber</text></svg>`,
+  // Toppings - good (traps)
+  tomato_sauce: `<svg viewBox="0 0 64 64"><rect x="16" y="20" width="32" height="36" rx="4" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/><rect x="16" y="20" width="32" height="10" rx="4" fill="#c0392b"/><text x="32" y="28" text-anchor="middle" font-size="6" fill="#fff" font-weight="bold">TOMATO</text><text x="32" y="44" text-anchor="middle" font-size="7" fill="#fff" font-weight="bold">SAUCE</text><rect x="26" y="14" width="12" height="8" rx="2" fill="#c0392b"/></svg>`,
+  mozzarella: `<svg viewBox="0 0 64 64"><ellipse cx="32" cy="36" rx="22" ry="18" fill="#fff8e8" stroke="#e8d8b8" stroke-width="2"/><ellipse cx="32" cy="34" rx="18" ry="14" fill="white" opacity="0.5"/><ellipse cx="28" cy="32" rx="6" ry="4" fill="white" opacity="0.4"/><text x="32" y="54" text-anchor="middle" font-size="5" fill="#bba880" font-style="italic">fresh</text></svg>`,
+  olives: `<svg viewBox="0 0 64 64"><ellipse cx="22" cy="30" rx="8" ry="10" fill="#2d5a27" stroke="#1a3a16" stroke-width="2"/><ellipse cx="42" cy="34" rx="8" ry="10" fill="#2d5a27" stroke="#1a3a16" stroke-width="2"/><ellipse cx="32" cy="46" rx="8" ry="10" fill="#2d5a27" stroke="#1a3a16" stroke-width="2"/><circle cx="22" cy="28" r="3" fill="#1a3a16"/><circle cx="42" cy="32" r="3" fill="#1a3a16"/><circle cx="32" cy="44" r="3" fill="#1a3a16"/></svg>`,
+  // Tools
+  road_roller: `<svg viewBox="0 0 64 64"><rect x="8" y="32" width="48" height="16" rx="8" fill="#888" stroke="#666" stroke-width="2"/><rect x="24" y="16" width="16" height="18" rx="3" fill="#f4a430" stroke="#d48a10" stroke-width="2"/><rect x="28" y="10" width="8" height="8" rx="2" fill="#666"/><circle cx="16" cy="40" r="8" fill="#666" stroke="#444" stroke-width="2"/><circle cx="48" cy="40" r="8" fill="#666" stroke="#444" stroke-width="2"/></svg>`,
+  cement_mixer: `<svg viewBox="0 0 64 64"><ellipse cx="30" cy="32" rx="20" ry="18" fill="#f39c12" stroke="#d48a10" stroke-width="2" transform="rotate(-15 30 32)"/><rect x="42" y="20" width="14" height="8" rx="2" fill="#888"/><circle cx="18" cy="52" r="6" fill="#555" stroke="#444" stroke-width="2"/><circle cx="42" cy="52" r="6" fill="#555" stroke="#444" stroke-width="2"/><path d="M30 16 L30 10" stroke="#888" stroke-width="3"/><animate attributeType="XML" attributeName="opacity" values="1;0.9;1" dur="0.3s" repeatCount="indefinite"/></svg>`,
+  explosion: `<svg viewBox="0 0 64 64"><polygon points="32,4 38,22 56,22 42,34 48,52 32,42 16,52 22,34 8,22 26,22" fill="#ff6b6b" stroke="#c0392b" stroke-width="2"/><polygon points="32,14 36,26 48,26 38,34 42,46 32,38 22,46 26,34 16,26 28,26" fill="#ffd93d"/><circle cx="32" cy="32" r="6" fill="#fff" opacity="0.8"/></svg>`,
+  normal_spoon: `<svg viewBox="0 0 64 64"><ellipse cx="32" cy="20" rx="12" ry="10" fill="#ccc" stroke="#aaa" stroke-width="2"/><rect x="30" y="28" width="4" height="30" rx="2" fill="#bbb" stroke="#aaa" stroke-width="1"/><ellipse cx="32" cy="18" rx="8" ry="6" fill="#ddd" opacity="0.4"/></svg>`,
+  // Ovens
+  volcano: `<svg viewBox="0 0 64 64"><polygon points="32,8 8,56 56,56" fill="#8b4513" stroke="#6b3410" stroke-width="2"/><polygon points="32,8 24,28 40,28" fill="#e74c3c"/><circle cx="28" cy="16" r="3" fill="#f39c12" opacity="0.7"><animate attributeName="cy" values="16;10;16" dur="1s" repeatCount="indefinite"/></circle><circle cx="36" cy="14" r="2" fill="#ffd93d" opacity="0.6"><animate attributeName="cy" values="14;6;14" dur="0.8s" repeatCount="indefinite"/></circle></svg>`,
+  satellite: `<svg viewBox="0 0 64 64"><rect x="24" y="24" width="16" height="16" rx="2" fill="#888" stroke="#666" stroke-width="2"/><rect x="6" y="28" width="20" height="8" rx="1" fill="#4a90d9" stroke="#3670b0" stroke-width="1"/><rect x="38" y="28" width="20" height="8" rx="1" fill="#4a90d9" stroke="#3670b0" stroke-width="1"/><circle cx="32" cy="32" r="3" fill="#e74c3c"/><path d="M20 48 Q32 58 44 48" stroke="#ff6b6b" stroke-width="2" fill="none" opacity="0.5"/><path d="M24 52 Q32 60 40 52" stroke="#ff6b6b" stroke-width="1.5" fill="none" opacity="0.3"/></svg>`,
+  lightning: `<svg viewBox="0 0 64 64"><polygon points="36,4 18,32 28,32 22,60 48,26 36,26 44,4" fill="#ffd93d" stroke="#f0c420" stroke-width="2"/><polygon points="34,10 24,30 30,30 26,50 42,28 36,28 40,10" fill="#fff" opacity="0.4"/></svg>`,
+  regular_oven: `<svg viewBox="0 0 64 64"><rect x="10" y="12" width="44" height="44" rx="4" fill="#888" stroke="#666" stroke-width="2"/><rect x="16" y="18" width="32" height="24" rx="2" fill="#333"/><rect x="18" y="20" width="28" height="20" rx="1" fill="#444"/><circle cx="20" cy="50" r="3" fill="#555"/><circle cx="32" cy="50" r="3" fill="#555"/><circle cx="44" cy="50" r="3" fill="#555"/></svg>`,
+  // Bowl
+  bowl: `<svg viewBox="0 0 120 100"><ellipse cx="60" cy="30" rx="55" ry="15" fill="#d4a574" stroke="#b08050" stroke-width="3"/><path d="M5 30 Q5 85 60 85 Q115 85 115 30" fill="#c49464" stroke="#b08050" stroke-width="3"/><ellipse cx="60" cy="30" rx="48" ry="12" fill="#8b6914" opacity="0.2"/></svg>`,
+  flatbread: `<svg viewBox="0 0 120 100"><ellipse cx="60" cy="50" rx="55" ry="40" fill="#e8c878" stroke="#d4a430" stroke-width="3"/><ellipse cx="60" cy="48" rx="48" ry="34" fill="#f0d888" opacity="0.4"/><circle cx="35" cy="42" r="4" fill="#d4a430" opacity="0.3"/><circle cx="55" cy="55" r="3" fill="#d4a430" opacity="0.3"/><circle cx="75" cy="40" r="5" fill="#d4a430" opacity="0.3"/></svg>`,
+};
 
-// ============ STAGE DATA ============
-const STAGES = [
-  // STAGE 0: Dough ingredients (drag to bowl)
-  {
-    title: "STEP 1: THE DOUGH",
-    desc: "Drag the WORST ingredients into the bowl. Reject anything edible!",
-    type: "drag",
-    target: 5,
-    bowlEmoji: "🥣",
-    items: [
-      { emoji: "☢️", name: "Enriched Uranium", bad: true, points: 30, comment: "Glowing dough! FDA will love this." },
-      { emoji: "🥚", name: "Ostrich Egg (47 of them)", bad: true, points: 25, comment: "One egg per guest... if your guests are elephants." },
-      { emoji: "🍫", name: "15L Chocolate Milk", bad: true, points: 25, comment: "Hydration is important, even in crimes." },
-      { emoji: "🧈", name: "Flying Butter (alive)", bad: true, points: 30, comment: "It's trying to escape. Smart butter." },
-      { emoji: "🧱", name: "Brick Dust Flour", bad: true, points: 20, comment: "Adds that rustic, load-bearing texture." },
-      { emoji: "🦷", name: "Grandma's Dentures", bad: true, points: 35, comment: "Extra crunch. Grandma didn't agree." },
-      { emoji: "🪨", name: "Gravel (artisan)", bad: true, points: 20, comment: "Farm-to-table? This is quarry-to-table." },
-      { emoji: "🌋", name: "Lava (fresh)", bad: true, points: 30, comment: "Self-heating dough. Efficient!" },
-      // TRAP: good ingredients
-      { emoji: "🍞", name: "Normal Flour", bad: false, points: -20, comment: "BORING! What are you, a chef?!" },
-      { emoji: "💧", name: "Clean Water", bad: false, points: -15, comment: "How DARE you add something drinkable!" },
-      { emoji: "🧂", name: "Regular Salt", bad: false, points: -10, comment: "Get that reasonable seasoning out of here!" },
-      { emoji: "🥛", name: "Fresh Milk", bad: false, points: -15, comment: "This isn't a bakery, it's a CRIME SCENE!" },
-    ]
-  },
-  // STAGE 1: Mixing method (choice)
-  {
-    title: "STEP 2: MIX THE DOUGH",
-    desc: "How shall we mix this abomination?",
-    type: "choice",
-    choices: [
-      { emoji: "🚜", name: "Road Roller", desc: "Flatten it like a parking lot", points: 30, comment: "The dough is now 0.01mm thin and covers 3 city blocks." },
-      { emoji: "🌪️", name: "Industrial Cement Mixer", desc: "Spin at 9000 RPM", points: 35, comment: "The dough has achieved orbit. We can see it from space." },
-      { emoji: "💣", name: "Controlled Explosion", desc: "Mix via detonation", points: 40, comment: "Mixed perfectly! Also mixed with the kitchen ceiling." },
-      { emoji: "🥄", name: "A Normal Spoon", desc: "Like a reasonable person", points: -10, comment: "You call this a crime? Disappointing." },
-    ]
-  },
-  // STAGE 2: Sauce & toppings (drag)
-  {
-    title: "STEP 3: SAUCE & TOPPINGS",
-    desc: "Drag the most cursed toppings onto your pizza base!",
-    type: "drag",
-    target: 5,
-    bowlEmoji: "🫓",
-    items: [
-      { emoji: "🏺", name: "Sauce from 562 AD", bad: true, points: 35, comment: "Aged 1,464 years. Technically an archaeological find." },
-      { emoji: "☢️", name: "More Uranium", bad: true, points: 25, comment: "Double uranium. It's now a dirty bomb, not a pizza." },
-      { emoji: "🧦", name: "Worn Socks", bad: true, points: 30, comment: "The cheese substitute nobody asked for." },
-      { emoji: "🪼", name: "Immortal Jellyfish", bad: true, points: 30, comment: "This topping will outlive everyone who eats it." },
-      { emoji: "📎", name: "1000 Paperclips", bad: true, points: 20, comment: "Now it's office supplies on ancient sauce. Art." },
-      { emoji: "🫧", name: "Soap Bubbles", bad: true, points: 25, comment: "For that clean finish. Literally." },
-      { emoji: "🪩", name: "Disco Ball (whole)", bad: true, points: 35, comment: "Saturday Night Pizza. Fabulous and inedible." },
-      { emoji: "🦔", name: "A Hedgehog (fake)", bad: true, points: 25, comment: "Don't worry, it's rubber. Still tastes terrible." },
-      // TRAP: good
-      { emoji: "🍅", name: "Tomato Sauce", bad: false, points: -20, comment: "ARE YOU TRYING TO MAKE IT EDIBLE?!" },
-      { emoji: "🧀", name: "Mozzarella", bad: false, points: -25, comment: "NO! Actual cheese is BANNED in this kitchen!" },
-      { emoji: "🫒", name: "Fresh Olives", bad: false, points: -10, comment: "This is a war crime tribunal, not a deli!" },
-    ]
-  },
-  // STAGE 3: Choose oven (choice)
-  {
-    title: "STEP 4: CHOOSE YOUR OVEN",
-    desc: "Where shall we cook this masterpiece?",
-    type: "choice",
-    choices: [
-      { emoji: "🌋", name: "Active Volcano", desc: "Authentic wood-fired... by magma", points: 35, comment: "Neapolitan purists are crying. From the lava burns." },
-      { emoji: "🛰️", name: "Satellite Re-entry", desc: "Cook during atmospheric re-entry", points: 40, comment: "12,000°C for 0.3 seconds. Perfectly charred. To atoms." },
-      { emoji: "⚡", name: "Lightning Strike", desc: "One bolt, extra crispy", points: 35, comment: "1.21 gigawatts! The pizza went back in time!" },
-      { emoji: "🫖", name: "A Regular Oven", desc: "180°C, 15 minutes", points: -15, comment: "Pathetic. A real oven? In THIS economy?" },
-    ]
-  },
-  // STAGE 4: Cooking time (slider)
-  {
-    title: "STEP 5: SET THE TIMER",
-    desc: "How long should we cook this thing?",
-    type: "cooking",
-  },
-];
+// Final pizza SVG
+function getPizzaSVG(crimeLevel) {
+  const glow = crimeLevel >= 3 ? `<circle cx="150" cy="150" r="120" fill="#4a4" opacity="0.15"><animate attributeName="r" values="120;130;120" dur="2s" repeatCount="indefinite"/></circle>` : '';
+  const skull = crimeLevel >= 2 ? `<text x="150" y="160" text-anchor="middle" font-size="60" opacity="0.8">☠️</text>` : '';
+  const flames = crimeLevel >= 1 ? `
+    <circle cx="80" cy="240" r="15" fill="#e74c3c" opacity="0.6"><animate attributeName="cy" values="240;220;240" dur="1s" repeatCount="indefinite"/></circle>
+    <circle cx="220" cy="240" r="12" fill="#f39c12" opacity="0.5"><animate attributeName="cy" values="240;225;240" dur="0.8s" repeatCount="indefinite"/></circle>
+  ` : '';
 
-const TIME_OPTIONS = [
-  { label: "15 minutes", value: 15, unit: "min", points: -10, comment: "That's... actually correct. Disgusting." },
-  { label: "3.5 hours", value: 210, unit: "min", points: 10, comment: "It's getting dry. Getting there." },
-  { label: "1 week", value: 10080, unit: "min", points: 20, comment: "The pizza is now a fossil." },
-  { label: "47 years", value: 24700000, unit: "min", points: 30, comment: "You started cooking before you were born." },
-  { label: "562 years", value: 295000000, unit: "min", points: 50, comment: "Started in 1464. Leonardo da Vinci could've eaten this. He wouldn't." },
-  { label: "Heat death of universe", value: Infinity, unit: "∞", points: 60, comment: "The oven outlasted reality itself. The pizza is eternal." },
-];
+  return `<svg width="300" height="300" viewBox="0 0 300 300">
+    ${glow}
+    <!-- plate -->
+    <ellipse cx="150" cy="160" rx="130" ry="120" fill="#f5f0e0" stroke="#ddd" stroke-width="3"/>
+    <!-- pizza base -->
+    <path d="M150 40 L270 240 L30 240 Z" fill="#d4a430" stroke="#b08020" stroke-width="3"/>
+    <path d="M150 50 L260 235 L40 235 Z" fill="#e8b830"/>
+    <!-- sauce layer -->
+    <path d="M150 65 L248 228 L52 228 Z" fill="#c0392b" opacity="0.8"/>
+    <!-- cheese (melted, weird) -->
+    <path d="M150 70 L240 222 L60 222 Z" fill="#f4d03f" opacity="${crimeLevel >= 2 ? '0.4' : '0.7'}"/>
+    ${crimeLevel >= 3 ? '<path d="M150 70 L240 222 L60 222 Z" fill="#4a4" opacity="0.3"/>' : ''}
+    <!-- toppings -->
+    <circle cx="130" cy="140" r="12" fill="#e74c3c" stroke="#a02010" stroke-width="2"/>
+    <circle cx="175" cy="160" r="10" fill="#8b6914" opacity="0.8"/>
+    <circle cx="150" cy="190" r="8" fill="#9b59b6"/>
+    <circle cx="120" cy="180" r="9" fill="#27ae60" opacity="0.7"/>
+    <rect x="160" y="175" width="15" height="3" rx="1" fill="#c0c0c0" transform="rotate(30 167 176)"/>
+    <rect x="140" y="205" width="12" height="3" rx="1" fill="#c0c0c0" transform="rotate(-20 146 206)"/>
+    ${crimeLevel >= 2 ? '<circle cx="190" cy="140" r="7" fill="#4a4" stroke="#2d6a2d" stroke-width="1.5"/><text x="190" y="143" text-anchor="middle" font-size="8" fill="#1a3a1a" font-weight="bold">☢</text>' : ''}
+    <!-- crust detail -->
+    <path d="M80 220 Q150 235 220 220" stroke="#c49050" stroke-width="4" fill="none"/>
+    ${skull}
+    ${flames}
+    <!-- steam/smoke -->
+    <path d="M100 60 Q95 40 105 30" stroke="#999" stroke-width="2" fill="none" opacity="0.4"><animate attributeName="d" values="M100 60 Q95 40 105 30;M100 60 Q90 35 100 25;M100 60 Q95 40 105 30" dur="2s" repeatCount="indefinite"/></path>
+    <path d="M200 55 Q205 35 195 25" stroke="#999" stroke-width="2" fill="none" opacity="0.3"><animate attributeName="d" values="M200 55 Q205 35 195 25;M200 55 Q210 30 200 20;M200 55 Q205 35 195 25" dur="2.5s" repeatCount="indefinite"/></path>
+  </svg>`;
+}
 
-const TEMP_OPTIONS = [
-  { label: "180°C (normal)", value: 180, points: -10 },
-  { label: "800°C (kiln)", value: 800, points: 10 },
-  { label: "5,500°C (surface of the Sun)", value: 5500, points: 30 },
-  { label: "100,000,000°C (nuclear fusion)", value: 100000000, points: 45 },
-  { label: "∞°C (undefined by physics)", value: Infinity, points: 55 },
-];
+function iconHTML(key, w, h) {
+  return ICONS[key] ? `<img class="icon" src="data:image/svg+xml,${encodeURIComponent(ICONS[key])}" width="${w||64}" height="${h||64}" alt="">` : '';
+}
+function iconSrc(key) {
+  return ICONS[key] ? `data:image/svg+xml,${encodeURIComponent(ICONS[key])}` : '';
+}
 
-// ============ HELPERS ============
+// ═══════════════════════════════════════
+// MUSIC ENGINE (Web Audio API chiptune)
+// ═══════════════════════════════════════
+let audioCtx, musicPlaying = false, musicNodes = [];
+
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+
+function startMusic() {
+  initAudio();
+  if (musicPlaying) return;
+  musicPlaying = true;
+  document.getElementById('music-btn').textContent = '🔊';
+
+  const masterGain = audioCtx.createGain();
+  masterGain.gain.value = 0.12;
+  masterGain.connect(audioCtx.destination);
+
+  // Melody
+  const melody = [
+    261.6,329.6,392,523.2,392,329.6,261.6,196,
+    293.7,349.2,440,293.7,349.2,261.6,220,196,
+    329.6,392,523.2,659.3,523.2,440,392,329.6,
+    261.6,220,196,261.6,293.7,329.6,261.6,196,
+  ];
+  const bassDrum = [1,0,0,0,1,0,1,0, 1,0,0,0,1,0,1,0, 1,0,0,0,1,0,1,0, 1,0,0,0,1,0,1,0];
+  const bpm = 160;
+  const noteLen = 60 / bpm;
+  const loopLen = melody.length * noteLen;
+
+  function scheduleLoop(startTime) {
+    melody.forEach((freq, i) => {
+      const t = startTime + i * noteLen;
+      // Melody osc
+      const osc = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      osc.type = 'square';
+      osc.frequency.value = freq;
+      g.gain.setValueAtTime(0.3, t);
+      g.gain.exponentialRampToValueAtTime(0.01, t + noteLen * 0.8);
+      osc.connect(g);
+      g.connect(masterGain);
+      osc.start(t);
+      osc.stop(t + noteLen * 0.9);
+      musicNodes.push(osc);
+
+      // Bass
+      if (bassDrum[i]) {
+        const bOsc = audioCtx.createOscillator();
+        const bG = audioCtx.createGain();
+        bOsc.type = 'triangle';
+        bOsc.frequency.value = freq / 4;
+        bG.gain.setValueAtTime(0.5, t);
+        bG.gain.exponentialRampToValueAtTime(0.01, t + noteLen * 1.5);
+        bOsc.connect(bG);
+        bG.connect(masterGain);
+        bOsc.start(t);
+        bOsc.stop(t + noteLen * 2);
+        musicNodes.push(bOsc);
+      }
+
+      // Hi-hat noise
+      if (i % 2 === 0) {
+        const bufSize = audioCtx.sampleRate * noteLen * 0.3;
+        const buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let j = 0; j < bufSize; j++) data[j] = Math.random() * 2 - 1;
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buf;
+        const nG = audioCtx.createGain();
+        nG.gain.setValueAtTime(0.08, t);
+        nG.gain.exponentialRampToValueAtTime(0.001, t + noteLen * 0.3);
+        const hipass = audioCtx.createBiquadFilter();
+        hipass.type = 'highpass';
+        hipass.frequency.value = 8000;
+        noise.connect(hipass);
+        hipass.connect(nG);
+        nG.connect(masterGain);
+        noise.start(t);
+        noise.stop(t + noteLen * 0.4);
+        musicNodes.push(noise);
+      }
+    });
+  }
+
+  let currentTime = audioCtx.currentTime + 0.05;
+  function loop() {
+    if (!musicPlaying) return;
+    scheduleLoop(currentTime);
+    const nextTime = currentTime + loopLen;
+    const delay = (nextTime - audioCtx.currentTime - 0.5) * 1000;
+    setTimeout(() => {
+      currentTime = nextTime;
+      loop();
+    }, Math.max(delay, 100));
+  }
+  loop();
+}
+
+function stopMusic() {
+  musicPlaying = false;
+  document.getElementById('music-btn').textContent = '🔇';
+  musicNodes.forEach(n => { try { n.stop(); } catch(e){} });
+  musicNodes = [];
+}
+
+function toggleMusic() {
+  if (musicPlaying) stopMusic();
+  else startMusic();
+}
+
+// ═══════════════════════════════════════
+// GAME STATE
+// ═══════════════════════════════════════
+let score = 0, currentStage = 0, chosenItems = [], stageResults = {}, gameMode = 'classic';
+
 function $(id) { return document.getElementById(id); }
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   $(id).classList.add('active');
 }
-
 function updateScore(pts) {
   score += pts;
   if (score < 0) score = 0;
   $('score-display').textContent = score;
-  maxScore += Math.abs(pts);
-  const pct = Math.min((score / 400) * 100, 100);
-  $('crime-meter').style.width = pct + '%';
+  $('crime-meter').style.width = Math.min((score / 400) * 100, 100) + '%';
 }
-
 function setCommentary(text) {
   const el = $('commentary');
   el.style.opacity = 0;
-  setTimeout(() => {
-    el.textContent = text;
-    el.style.opacity = 1;
-  }, 150);
+  setTimeout(() => { el.textContent = text; el.style.opacity = 1; }, 150);
 }
-
-function showFlash(text, isBad) {
-  const flash = document.createElement('div');
-  flash.className = 'penalty-flash' + (isBad ? ' bad' : '');
-  flash.textContent = text;
-  document.body.appendChild(flash);
-  setTimeout(() => flash.remove(), 1000);
+function showFlash(text, isGood) {
+  const f = document.createElement('div');
+  f.className = 'flash-text ' + (isGood ? 'flash-good' : 'flash-bad');
+  f.textContent = text;
+  document.body.appendChild(f);
+  setTimeout(() => f.remove(), 1000);
 }
-
 function createNextButton(onClick) {
   const btn = document.createElement('button');
   btn.className = 'btn btn-next';
@@ -653,144 +571,203 @@ function createNextButton(onClick) {
   return btn;
 }
 
-// ============ GAME FLOW ============
-function startGame() {
-  score = 0;
-  maxScore = 0;
-  currentStage = 0;
-  chosenItems = [];
-  stageResults = {};
+// ═══════════════════════════════════════
+// STAGE DATA
+// ═══════════════════════════════════════
+const STAGES = [
+  {
+    title: "STEP 1: THE DOUGH",
+    desc: "Pick 5 ingredients for your dough. Choose wisely... or not.",
+    type: "drag", target: 5, bowlIcon: "bowl",
+    items: [
+      { icon:"uranium", name:"Enriched Uranium", bad:true, points:30, comment:"Glowing dough! FDA will love this." },
+      { icon:"ostrich_egg", name:"47 Ostrich Eggs", bad:true, points:25, comment:"One egg per guest... if your guests are elephants." },
+      { icon:"choc_milk", name:"15L Chocolate Milk", bad:true, points:25, comment:"Hydration is important, even in crimes." },
+      { icon:"flying_butter", name:"Flying Butter (alive)", bad:true, points:30, comment:"It's trying to escape. Smart butter." },
+      { icon:"brick_dust", name:"Brick Dust Flour", bad:true, points:20, comment:"Adds that rustic, load-bearing texture." },
+      { icon:"dentures", name:"Grandma's Dentures", bad:true, points:35, comment:"Extra crunch. Grandma didn't agree to this." },
+      { icon:"gravel", name:"Gravel (artisan)", bad:true, points:20, comment:"Farm-to-table? This is quarry-to-table." },
+      { icon:"lava", name:"Lava (fresh)", bad:true, points:30, comment:"Self-heating dough. Efficient!" },
+      { icon:"flour", name:"Normal Flour", bad:false, points:-20, comment:"BORING! What are you, a chef?!" },
+      { icon:"water", name:"Clean Water", bad:false, points:-15, comment:"How DARE you add something drinkable!" },
+      { icon:"salt", name:"Regular Salt", bad:false, points:-10, comment:"Get that reasonable seasoning out of here!" },
+      { icon:"milk", name:"Fresh Milk", bad:false, points:-15, comment:"This isn't a bakery, it's a CRIME SCENE!" },
+    ]
+  },
+  {
+    title: "STEP 2: MIX THE DOUGH",
+    desc: "How shall we mix this abomination?",
+    type: "choice",
+    choices: [
+      { icon:"road_roller", name:"Road Roller", desc:"Flatten it like a parking lot", points:30, comment:"The dough is now 0.01mm thin and covers 3 city blocks." },
+      { icon:"cement_mixer", name:"Cement Mixer", desc:"Spin at 9000 RPM", points:35, comment:"The dough has achieved orbit. We can see it from space." },
+      { icon:"explosion", name:"Controlled Explosion", desc:"Mix via detonation", points:40, comment:"Mixed perfectly! Also mixed with the kitchen ceiling." },
+      { icon:"normal_spoon", name:"A Normal Spoon", desc:"Like a reasonable person", points:-10, comment:"You call this a crime? Disappointing." },
+    ]
+  },
+  {
+    title: "STEP 3: SAUCE & TOPPINGS",
+    desc: "Pick 5 toppings for your pizza base!",
+    type: "drag", target: 5, bowlIcon: "flatbread",
+    items: [
+      { icon:"ancient_sauce", name:"Sauce from 562 AD", bad:true, points:35, comment:"Aged 1,464 years. Technically an archaeological find." },
+      { icon:"uranium2", name:"More Uranium", bad:true, points:25, comment:"Double uranium. It's now a dirty bomb, not a pizza." },
+      { icon:"socks", name:"Worn Socks", bad:true, points:30, comment:"The cheese substitute nobody asked for." },
+      { icon:"jellyfish", name:"Immortal Jellyfish", bad:true, points:30, comment:"This topping will outlive everyone who eats it." },
+      { icon:"paperclips", name:"1000 Paperclips", bad:true, points:20, comment:"Now it's office supplies on ancient sauce. Art." },
+      { icon:"soap", name:"Soap Bubbles", bad:true, points:25, comment:"For that clean finish. Literally." },
+      { icon:"disco_ball", name:"Disco Ball (whole)", bad:true, points:35, comment:"Saturday Night Pizza. Fabulous and inedible." },
+      { icon:"hedgehog", name:"Hedgehog (rubber)", bad:true, points:25, comment:"Don't worry, it's fake. Still tastes terrible." },
+      { icon:"tomato_sauce", name:"Tomato Sauce", bad:false, points:-20, comment:"ARE YOU TRYING TO MAKE IT EDIBLE?!" },
+      { icon:"mozzarella", name:"Mozzarella", bad:false, points:-25, comment:"NO! Actual cheese is BANNED in this kitchen!" },
+      { icon:"olives", name:"Fresh Olives", bad:false, points:-10, comment:"This is a war crime tribunal, not a deli!" },
+    ]
+  },
+  {
+    title: "STEP 4: CHOOSE YOUR OVEN",
+    desc: "Where shall we cook this masterpiece?",
+    type: "choice",
+    choices: [
+      { icon:"volcano", name:"Active Volcano", desc:"Authentic wood-fired... by magma", points:35, comment:"Neapolitan purists are crying. From the lava burns." },
+      { icon:"satellite", name:"Satellite Re-entry", desc:"Cook during atmospheric re-entry", points:40, comment:"12,000°C for 0.3 seconds. Perfectly charred. To atoms." },
+      { icon:"lightning", name:"Lightning Strike", desc:"One bolt, extra crispy", points:35, comment:"1.21 gigawatts! The pizza went back in time!" },
+      { icon:"regular_oven", name:"A Regular Oven", desc:"180°C, 15 minutes", points:-15, comment:"Pathetic. A real oven? In THIS economy?" },
+    ]
+  },
+  {
+    title: "STEP 5: SET THE TIMER",
+    desc: "How long should we cook this thing?",
+    type: "cooking",
+  },
+];
+
+const TIME_OPTIONS = [
+  { label:"15 minutes", points:-10, comment:"That's... actually correct. Disgusting." },
+  { label:"3.5 hours", points:10, comment:"It's getting dry. Getting there." },
+  { label:"1 week", points:20, comment:"The pizza is now a fossil." },
+  { label:"47 years", points:30, comment:"You started cooking before you were born." },
+  { label:"562 years", points:50, comment:"Started in 1464. Leonardo da Vinci could've eaten this. He wouldn't." },
+  { label:"Heat death of universe", points:60, comment:"The oven outlasted reality itself. The pizza is eternal." },
+];
+const TEMP_OPTIONS = [
+  { label:"180°C (normal)", points:-10 },
+  { label:"800°C (kiln)", points:10 },
+  { label:"5,500°C (Sun's surface)", points:30 },
+  { label:"100,000,000°C (fusion)", points:45 },
+  { label:"∞°C (breaks physics)", points:55 },
+];
+
+// ═══════════════════════════════════════
+// FLOW
+// ═══════════════════════════════════════
+function showModeSelect() {
+  showScreen('mode-screen');
+}
+
+function startGame(mode) {
+  gameMode = mode;
+  score = 0; currentStage = 0; chosenItems = []; stageResults = {};
   $('score-display').textContent = '0';
   $('crime-meter').style.width = '0%';
   showScreen('game-screen');
-  loadStage(0);
+  if (!musicPlaying) startMusic();
+  if (mode === 'classic') loadStage(0);
+  else startChaosMode();
 }
 
 function loadStage(idx) {
   currentStage = idx;
-  const stage = STAGES[idx];
-  $('stage-title').textContent = stage.title;
-  $('stage-desc').textContent = stage.desc;
+  const s = STAGES[idx];
+  $('stage-title').textContent = s.title;
+  $('stage-desc').textContent = s.desc;
   setCommentary("Choose wisely... or rather, choose terribly.");
-
   const area = $('game-area');
   area.innerHTML = '';
-
-  if (stage.type === 'drag') buildDragStage(stage, area);
-  else if (stage.type === 'choice') buildChoiceStage(stage, area);
-  else if (stage.type === 'cooking') buildCookingStage(stage, area);
+  if (s.type === 'drag') buildDragStage(s, area);
+  else if (s.type === 'choice') buildChoiceStage(s, area);
+  else if (s.type === 'cooking') buildCookingStage(s, area);
 }
 
 function nextStage() {
-  if (currentStage < STAGES.length - 1) {
-    loadStage(currentStage + 1);
-  } else {
-    showResults();
-  }
+  if (currentStage < STAGES.length - 1) loadStage(currentStage + 1);
+  else showResults();
 }
 
-// ============ DRAG STAGE ============
+// ═══════════════════════════════════════
+// DRAG STAGE
+// ═══════════════════════════════════════
 function buildDragStage(stage, area) {
   let added = 0;
-
-  // Bowl
   const bowlArea = document.createElement('div');
   bowlArea.className = 'bowl-area';
-  const bowl = document.createElement('div');
-  bowl.className = 'bowl';
-  bowl.textContent = stage.bowlEmoji;
+  const bowlImg = document.createElement('img');
+  bowlImg.className = 'bowl-svg';
+  bowlImg.src = iconSrc(stage.bowlIcon);
+  bowlImg.width = 180;
+  bowlImg.height = 150;
   const bowlContents = document.createElement('div');
   bowlContents.className = 'bowl-contents';
   bowlArea.appendChild(bowlContents);
-  bowlArea.appendChild(bowl);
+  bowlArea.appendChild(bowlImg);
   area.appendChild(bowlArea);
 
-  // Conveyor
   const conveyor = document.createElement('div');
   conveyor.className = 'conveyor';
-
-  // Shuffle items
   const shuffled = [...stage.items].sort(() => Math.random() - 0.5);
 
   shuffled.forEach(item => {
     const el = document.createElement('div');
-    el.className = `ingredient ${item.bad ? 'bad' : 'good'}`;
-    el.innerHTML = `<span class="emoji">${item.emoji}</span><span class="name">${item.name}</span>`;
+    el.className = 'ingredient';
+    el.innerHTML = `${iconHTML(item.icon)}<span class="name">${item.name}</span>`;
     el.onclick = () => {
       if (el.classList.contains('added')) return;
       el.classList.add('added');
-
-      // Add to bowl
-      const mini = document.createElement('span');
-      mini.className = 'mini-emoji';
-      mini.textContent = item.emoji;
+      const mini = document.createElement('img');
+      mini.className = 'mini-icon';
+      mini.src = iconSrc(item.icon);
+      mini.width = 28; mini.height = 28;
       bowlContents.appendChild(mini);
-      bowl.classList.remove('shake');
-      void bowl.offsetWidth;
-      bowl.classList.add('shake');
-
+      bowlImg.classList.remove('shake');
+      void bowlImg.offsetWidth;
+      bowlImg.classList.add('shake');
       updateScore(item.points);
       setCommentary(item.comment);
       chosenItems.push(item);
-
-      if (item.bad) {
-        showFlash(`+${item.points} CRIME POINTS`, false);
-      } else {
-        showFlash(`${item.points} PENALTY!`, true);
-      }
-
+      if (item.bad) showFlash(`+${item.points} CRIME POINTS`, true);
+      else showFlash(`${item.points} PENALTY!`, false);
       added++;
       if (added >= stage.target) {
-        // Disable remaining
-        conveyor.querySelectorAll('.ingredient:not(.added)').forEach(el => {
-          el.style.opacity = '0.3';
-          el.style.pointerEvents = 'none';
-        });
-        setCommentary("The bowl is full of regret. Let's continue.");
+        conveyor.querySelectorAll('.ingredient:not(.added)').forEach(e => { e.style.opacity='0.2'; e.style.pointerEvents='none'; });
+        setCommentary("Full of regret. Let's continue.");
         area.appendChild(createNextButton(nextStage));
       }
     };
     conveyor.appendChild(el);
   });
   area.appendChild(conveyor);
-
-  // Stage result tracking
-  stageResults[currentStage] = { type: 'drag', items: chosenItems };
 }
 
-// ============ CHOICE STAGE ============
+// ═══════════════════════════════════════
+// CHOICE STAGE
+// ═══════════════════════════════════════
 function buildChoiceStage(stage, area) {
   const choices = document.createElement('div');
   choices.className = 'choices';
-
   stage.choices.forEach(ch => {
     const card = document.createElement('div');
     card.className = 'choice-card';
-    card.innerHTML = `
-      <div class="emoji">${ch.emoji}</div>
-      <div class="name">${ch.name}</div>
-      <div class="desc">${ch.desc}</div>
-    `;
+    card.innerHTML = `<div class="icon">${iconHTML(ch.icon, 80, 80)}</div><div class="name">${ch.name}</div><div class="desc">${ch.desc}</div>`;
     card.onclick = () => {
-      choices.querySelectorAll('.choice-card').forEach(c => {
-        c.style.opacity = '0.3';
-        c.style.pointerEvents = 'none';
-      });
+      choices.querySelectorAll('.choice-card').forEach(c => { c.style.opacity='0.3'; c.style.pointerEvents='none'; });
       card.style.opacity = '1';
       card.style.border = '2px solid #ffd93d';
       card.style.boxShadow = '0 0 30px rgba(255,217,61,0.3)';
-
       updateScore(ch.points);
       setCommentary(ch.comment);
       chosenItems.push(ch);
-
-      if (ch.points > 0) {
-        showFlash(`+${ch.points} CRIME POINTS`, false);
-      } else {
-        showFlash(`${ch.points} PENALTY!`, true);
-      }
-
-      stageResults[currentStage] = { type: 'choice', choice: ch };
+      stageResults[currentStage] = { choice: ch };
+      if (ch.points > 0) showFlash(`+${ch.points} CRIME POINTS`, true);
+      else showFlash(`${ch.points} PENALTY!`, false);
       area.appendChild(createNextButton(nextStage));
     };
     choices.appendChild(card);
@@ -798,38 +775,25 @@ function buildChoiceStage(stage, area) {
   area.appendChild(choices);
 }
 
-// ============ COOKING STAGE ============
+// ═══════════════════════════════════════
+// COOKING STAGE
+// ═══════════════════════════════════════
 function buildCookingStage(stage, area) {
   const controls = document.createElement('div');
   controls.className = 'cooking-controls';
-
-  // Temperature slider
-  const tempDial = document.createElement('div');
-  tempDial.className = 'dial';
-  tempDial.innerHTML = `
-    <label>🌡️ TEMPERATURE</label>
-    <input type="range" min="0" max="${TEMP_OPTIONS.length - 1}" value="0" id="temp-slider">
-    <div class="dial-value" id="temp-value">${TEMP_OPTIONS[0].label}</div>
+  controls.innerHTML = `
+    <div class="dial">
+      <label>🌡️ TEMPERATURE</label>
+      <input type="range" min="0" max="${TEMP_OPTIONS.length-1}" value="0" id="temp-slider">
+      <div class="dial-value" id="temp-value">${TEMP_OPTIONS[0].label}</div>
+    </div>
+    <div class="dial">
+      <label>⏱️ COOKING TIME</label>
+      <input type="range" min="0" max="${TIME_OPTIONS.length-1}" value="0" id="time-slider">
+      <div class="dial-value" id="time-value">${TIME_OPTIONS[0].label}</div>
+    </div>
+    <div class="oven-area"><img class="oven-svg" id="oven-icon" src="${iconSrc('regular_oven')}" width="120" height="120"></div>
   `;
-  controls.appendChild(tempDial);
-
-  // Time slider
-  const timeDial = document.createElement('div');
-  timeDial.className = 'dial';
-  timeDial.innerHTML = `
-    <label>⏱️ COOKING TIME</label>
-    <input type="range" min="0" max="${TIME_OPTIONS.length - 1}" value="0" id="time-slider">
-    <div class="dial-value" id="time-value">${TIME_OPTIONS[0].label}</div>
-  `;
-  controls.appendChild(timeDial);
-
-  // Oven
-  const ovenArea = document.createElement('div');
-  ovenArea.className = 'oven-area';
-  ovenArea.innerHTML = `<div class="oven-emoji" id="oven-emoji">🍕</div>`;
-  controls.appendChild(ovenArea);
-
-  // Cook button
   const cookBtn = document.createElement('button');
   cookBtn.className = 'btn btn-start';
   cookBtn.textContent = '🔥 COOK IT!';
@@ -838,101 +802,206 @@ function buildCookingStage(stage, area) {
     const timeIdx = parseInt(document.getElementById('time-slider').value);
     const temp = TEMP_OPTIONS[tempIdx];
     const time = TIME_OPTIONS[timeIdx];
-
-    updateScore(temp.points + time.points);
-    if (temp.points + time.points > 0) {
-      showFlash(`+${temp.points + time.points} CRIME POINTS`, false);
-    } else {
-      showFlash(`${temp.points + time.points} PENALTY!`, true);
-    }
-
-    stageResults[currentStage] = { type: 'cooking', temp, time };
-
-    // Cooking animation
+    const pts = temp.points + time.points;
+    updateScore(pts);
+    stageResults[currentStage] = { temp, time };
+    if (pts > 0) showFlash(`+${pts} CRIME POINTS`, true);
+    else showFlash(`${pts} PENALTY!`, false);
     cookBtn.remove();
-    const oven = document.getElementById('oven-emoji');
+    const oven = document.getElementById('oven-icon');
     oven.classList.add('cooking');
     setCommentary(`Cooking at ${temp.label} for ${time.label}...`);
-
-    let phases = [
-      { emoji: "🍕", text: "Pizza is in..." },
-      { emoji: "🔥", text: "Getting warm..." },
-      { emoji: "💥", text: "Things are happening..." },
-      { emoji: "☠️", text: time.comment },
+    const phases = [
+      { icon:'regular_oven', text:"Pizza is in..." },
+      { icon:'volcano', text:"Getting warm..." },
+      { icon:'explosion', text:"Things are happening..." },
+      { icon:'lightning', text: time.comment },
     ];
     let i = 0;
     const interval = setInterval(() => {
       i++;
       if (i < phases.length) {
-        oven.textContent = phases[i].emoji;
+        oven.src = iconSrc(phases[i].icon);
         setCommentary(phases[i].text);
       }
       if (i >= phases.length) {
         clearInterval(interval);
         oven.classList.remove('cooking');
-        oven.textContent = '💀';
-        oven.style.fontSize = '10rem';
+        oven.src = iconSrc('explosion');
         area.appendChild(createNextButton(nextStage));
       }
     }, 1200);
   };
   controls.appendChild(cookBtn);
-
   area.appendChild(controls);
-
-  // Slider events
   setTimeout(() => {
-    document.getElementById('temp-slider').oninput = (e) => {
-      document.getElementById('temp-value').textContent = TEMP_OPTIONS[e.target.value].label;
-    };
-    document.getElementById('time-slider').oninput = (e) => {
-      document.getElementById('time-value').textContent = TIME_OPTIONS[e.target.value].label;
-    };
+    document.getElementById('temp-slider').oninput = e => { document.getElementById('temp-value').textContent = TEMP_OPTIONS[e.target.value].label; };
+    document.getElementById('time-slider').oninput = e => { document.getElementById('time-value').textContent = TIME_OPTIONS[e.target.value].label; };
   }, 50);
 }
 
-// ============ RESULTS ============
+// ═══════════════════════════════════════
+// CHAOS KITCHEN MODE
+// ═══════════════════════════════════════
+let chaosInterval, chaosTimer, chaosTimerInterval, chaosSpawnRate;
+
+const ALL_CHAOS_ITEMS = [
+  ...STAGES[0].items,
+  ...STAGES[2].items,
+];
+
+function startChaosMode() {
+  $('stage-title').textContent = 'CHAOS KITCHEN';
+  $('stage-desc').textContent = 'Click BAD ingredients as they fly by! Avoid the normal ones!';
+  setCommentary("60 seconds. Go go go!");
+
+  const area = $('game-area');
+  area.innerHTML = '';
+
+  // HUD
+  const hud = document.createElement('div');
+  hud.className = 'chaos-hud';
+  hud.innerHTML = `
+    <div class="chaos-timer" id="chaos-timer">60</div>
+    <div style="color:#aaa;font-size:0.9rem;">Caught:</div>
+    <div class="chaos-caught" id="chaos-caught"></div>
+  `;
+  area.appendChild(hud);
+
+  // Arena
+  const arena = document.createElement('div');
+  arena.className = 'chaos-arena';
+  arena.innerHTML = '<div class="chaos-belt"></div>';
+  arena.id = 'chaos-arena';
+  area.appendChild(arena);
+
+  chaosTimer = 60;
+  chaosSpawnRate = 1200;
+  let itemsCaught = 0;
+
+  function spawnItem() {
+    const item = ALL_CHAOS_ITEMS[Math.floor(Math.random() * ALL_CHAOS_ITEMS.length)];
+    const el = document.createElement('div');
+    el.className = 'chaos-item';
+    el.innerHTML = `<img class="icon" src="${iconSrc(item.icon)}" width="52" height="52"><span class="name">${item.name}</span>`;
+
+    const startY = 20 + Math.random() * 280;
+    el.style.left = '-100px';
+    el.style.top = startY + 'px';
+    arena.appendChild(el);
+
+    const speed = 2 + Math.random() * 2 + (60 - chaosTimer) * 0.05;
+    let x = -100;
+
+    el.onclick = () => {
+      el.remove();
+      updateScore(item.points);
+      chosenItems.push(item);
+      if (item.bad) {
+        showFlash(`+${item.points}`, true);
+        setCommentary(item.comment);
+        const mini = document.createElement('img');
+        mini.src = iconSrc(item.icon);
+        mini.width = 28; mini.height = 28;
+        $('chaos-caught').appendChild(mini);
+      } else {
+        showFlash(`${item.points} OOPS!`, false);
+        setCommentary(item.comment);
+      }
+    };
+
+    function move() {
+      if (!el.parentNode) return;
+      x += speed;
+      el.style.left = x + 'px';
+      if (x > arena.clientWidth + 100) {
+        el.remove();
+        // Missed a bad item = lost points
+        if (item.bad) {
+          setCommentary(`${item.name} escaped! A wasted crime.`);
+        }
+        return;
+      }
+      requestAnimationFrame(move);
+    }
+    requestAnimationFrame(move);
+  }
+
+  chaosInterval = setInterval(() => {
+    spawnItem();
+    // Speed up over time
+    if (chaosTimer < 40) chaosSpawnRate = 900;
+    if (chaosTimer < 20) chaosSpawnRate = 600;
+  }, chaosSpawnRate);
+
+  // Adaptive spawn rate
+  let lastRate = chaosSpawnRate;
+  const rateCheck = setInterval(() => {
+    if (chaosSpawnRate !== lastRate) {
+      clearInterval(chaosInterval);
+      chaosInterval = setInterval(spawnItem, chaosSpawnRate);
+      lastRate = chaosSpawnRate;
+    }
+  }, 500);
+
+  chaosTimerInterval = setInterval(() => {
+    chaosTimer--;
+    $('chaos-timer').textContent = chaosTimer;
+    if (chaosTimer <= 10) $('chaos-timer').style.color = '#ff0000';
+    if (chaosTimer <= 0) {
+      clearInterval(chaosInterval);
+      clearInterval(chaosTimerInterval);
+      clearInterval(rateCheck);
+      // Remove remaining items
+      arena.querySelectorAll('.chaos-item').forEach(el => el.remove());
+      setCommentary("TIME'S UP! Let's see the damage...");
+      area.appendChild(createNextButton(() => showResults()));
+    }
+  }, 1000);
+}
+
+// ═══════════════════════════════════════
+// RESULTS
+// ═══════════════════════════════════════
 function showResults() {
   showScreen('result-screen');
-
   let rank, rankClass, title;
-  if (score >= 350) { rank = 'S'; rankClass = 'rank-s'; title = 'LEGENDARY WAR CRIMINAL'; }
-  else if (score >= 250) { rank = 'A'; rankClass = 'rank-a'; title = 'MASTER OF DISASTER'; }
-  else if (score >= 150) { rank = 'B'; rankClass = 'rank-b'; title = 'AMATEUR ARSONIST'; }
-  else { rank = 'C'; rankClass = 'rank-c'; title = 'DISAPPOINTINGLY EDIBLE'; }
+  if (score >= 350) { rank='S'; rankClass='rank-s'; title='LEGENDARY WAR CRIMINAL'; }
+  else if (score >= 250) { rank='A'; rankClass='rank-a'; title='MASTER OF DISASTER'; }
+  else if (score >= 150) { rank='B'; rankClass='rank-b'; title='AMATEUR ARSONIST'; }
+  else { rank='C'; rankClass='rank-c'; title='DISAPPOINTINGLY EDIBLE'; }
 
-  // Gather stats
-  const mixChoice = stageResults[1]?.choice?.name || 'Unknown';
-  const ovenChoice = stageResults[3]?.choice?.name || 'Unknown';
-  const cookTemp = stageResults[4]?.temp?.label || 'Unknown';
-  const cookTime = stageResults[4]?.time?.label || 'Unknown';
+  const crimeLevel = rank === 'S' ? 3 : rank === 'A' ? 2 : rank === 'B' ? 1 : 0;
   const badItems = chosenItems.filter(i => i.bad !== false).length;
   const goodItems = chosenItems.filter(i => i.bad === false).length;
 
-  // Pizza emoji result based on score
-  let pizzaState;
-  if (score >= 350) pizzaState = '🟢☢️🍕☢️🟢';
-  else if (score >= 250) pizzaState = '💀🍕💀';
-  else if (score >= 150) pizzaState = '🔥🍕🔥';
-  else pizzaState = '🍕';
+  let statsHTML = `
+    <div><span class="stat-label">Crime Score</span><span class="stat-value">${score} pts</span></div>
+    <div><span class="stat-label">Terrible Items</span><span class="stat-value">${badItems}</span></div>
+    <div><span class="stat-label">Normal Items (shame)</span><span class="stat-value">${goodItems}</span></div>
+    <div><span class="stat-label">Mode</span><span class="stat-value">${gameMode === 'chaos' ? 'Chaos Kitchen' : 'Classic Crime'}</span></div>
+  `;
+  if (gameMode === 'classic') {
+    const mix = stageResults[1]?.choice?.name || '—';
+    const oven = stageResults[3]?.choice?.name || '—';
+    const temp = stageResults[4]?.temp?.label || '—';
+    const time = stageResults[4]?.time?.label || '—';
+    statsHTML += `
+      <div><span class="stat-label">Mixed With</span><span class="stat-value">${mix}</span></div>
+      <div><span class="stat-label">Cooked In</span><span class="stat-value">${oven}</span></div>
+      <div><span class="stat-label">Temperature</span><span class="stat-value">${temp}</span></div>
+      <div><span class="stat-label">Cook Time</span><span class="stat-value">${time}</span></div>
+    `;
+  }
 
   $('certificate').innerHTML = `
     <h2>PIZZA CRIME CERTIFICATE</h2>
     <div class="crime-title">"${title}"</div>
-    <div class="final-pizza">${pizzaState}</div>
-    <div class="stats">
-      <div><span class="stat-label">Crime Score</span><span class="stat-value">${score} pts</span></div>
-      <div><span class="stat-label">Terrible Ingredients Used</span><span class="stat-value">${badItems}</span></div>
-      <div><span class="stat-label">Normal Items (shame)</span><span class="stat-value">${goodItems}</span></div>
-      <div><span class="stat-label">Mixed With</span><span class="stat-value">${mixChoice}</span></div>
-      <div><span class="stat-label">Cooked In</span><span class="stat-value">${ovenChoice}</span></div>
-      <div><span class="stat-label">Temperature</span><span class="stat-value">${cookTemp}</span></div>
-      <div><span class="stat-label">Cook Time</span><span class="stat-value">${cookTime}</span></div>
-    </div>
+    <div class="final-pizza-wrap">${getPizzaSVG(crimeLevel)}</div>
+    <div class="stats">${statsHTML}</div>
     <div class="rank ${rankClass}">RANK: ${rank}</div>
   `;
 }
 </script>
-
 </body>
 </html>
