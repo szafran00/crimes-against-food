@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crimes Against Food</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Comic Neue', cursive;
+    background: #1a1a2e;
+    color: #eee;
+    min-height: 100vh;
+    overflow-x: hidden;
+    user-select: none;
+  }
+
+  h1, h2, h3 { font-family: 'Bangers', cursive; letter-spacing: 2px; }
+
+  /* SCREENS */
+  .screen { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+  .screen.active { display: flex; }
+
+  /* TITLE SCREEN */
+  #title-screen {
+    background: radial-gradient(ellipse at center, #2d1b69 0%, #1a1a2e 70%);
+    text-align: center;
+  }
+  #title-screen h1 {
+    font-size: clamp(3rem, 8vw, 6rem);
+    color: #ff6b6b;
+    text-shadow: 4px 4px 0 #000, 0 0 40px rgba(255,107,107,0.5);
+    margin-bottom: 10px;
+    animation: wobble 2s ease-in-out infinite;
+  }
+  #title-screen .subtitle {
+    font-size: 1.4rem;
+    color: #ffd93d;
+    margin-bottom: 40px;
+  }
+  @keyframes wobble {
+    0%, 100% { transform: rotate(-1deg); }
+    50% { transform: rotate(1deg); }
+  }
+
+  .btn {
+    font-family: 'Bangers', cursive;
+    font-size: 1.8rem;
+    padding: 15px 50px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn:hover { transform: scale(1.08); }
+  .btn:active { transform: scale(0.95); }
+  .btn-start {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+    color: white;
+    box-shadow: 0 6px 20px rgba(255,107,107,0.4);
+  }
+  .btn-next {
+    background: linear-gradient(135deg, #ffd93d, #f39c12);
+    color: #333;
+    box-shadow: 0 6px 20px rgba(255,217,61,0.4);
+    font-size: 1.4rem;
+    padding: 12px 40px;
+    margin-top: 20px;
+  }
+
+  /* GAME SCREEN */
+  #game-screen {
+    background: linear-gradient(180deg, #16213e 0%, #1a1a2e 100%);
+    padding: 20px;
+    justify-content: flex-start;
+  }
+
+  .stage-header {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  .stage-header h2 {
+    font-size: 2.2rem;
+    color: #ff6b6b;
+    text-shadow: 2px 2px 0 #000;
+  }
+  .stage-header p {
+    color: #aaa;
+    font-size: 1.1rem;
+    margin-top: 5px;
+  }
+
+  /* SCORE */
+  .score-bar {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50px;
+    padding: 8px 25px;
+    margin-bottom: 15px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .score-bar .label { color: #ffd93d; font-size: 1rem; }
+  .score-bar .value { font-family: 'Bangers', cursive; font-size: 1.6rem; color: #ff6b6b; }
+  .crime-meter {
+    width: 200px; height: 14px;
+    background: #333;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .crime-meter-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ffd93d, #ff6b6b, #9b59b6);
+    border-radius: 10px;
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+
+  /* CONVEYOR / INGREDIENT AREA */
+  .game-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 900px;
+    gap: 20px;
+  }
+
+  .conveyor {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 20px;
+    border: 2px dashed rgba(255,255,255,0.1);
+    min-height: 120px;
+    width: 100%;
+  }
+
+  .ingredient {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 16px;
+    border-radius: 16px;
+    cursor: grab;
+    transition: all 0.2s;
+    font-size: 0.85rem;
+    text-align: center;
+    width: 110px;
+    position: relative;
+  }
+  .ingredient:active { cursor: grabbing; }
+  .ingredient.bad {
+    background: rgba(255,107,107,0.15);
+    border: 2px solid rgba(255,107,107,0.3);
+  }
+  .ingredient.bad:hover {
+    background: rgba(255,107,107,0.25);
+    transform: scale(1.1);
+    box-shadow: 0 4px 20px rgba(255,107,107,0.3);
+  }
+  .ingredient.good {
+    background: rgba(46,213,115,0.15);
+    border: 2px solid rgba(46,213,115,0.3);
+  }
+  .ingredient.good:hover {
+    background: rgba(46,213,115,0.25);
+    transform: scale(1.1);
+  }
+  .ingredient .emoji {
+    font-size: 2.8rem;
+    line-height: 1;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  }
+  .ingredient .name { font-weight: 700; line-height: 1.2; }
+
+  .ingredient.added {
+    opacity: 0.3;
+    pointer-events: none;
+    transform: scale(0.8);
+  }
+
+  /* BOWL */
+  .bowl-area {
+    position: relative;
+    width: 280px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .bowl {
+    font-size: 10rem;
+    filter: drop-shadow(0 10px 30px rgba(0,0,0,0.5));
+    transition: transform 0.3s;
+    line-height: 1;
+  }
+  .bowl.shake {
+    animation: bowl-shake 0.4s ease;
+  }
+  @keyframes bowl-shake {
+    0%, 100% { transform: rotate(0) scale(1); }
+    25% { transform: rotate(-8deg) scale(1.05); }
+    75% { transform: rotate(8deg) scale(1.05); }
+  }
+
+  .bowl-contents {
+    position: absolute;
+    top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    justify-content: center;
+    width: 140px;
+    pointer-events: none;
+  }
+  .bowl-contents .mini-emoji {
+    font-size: 1.6rem;
+    animation: pop-in 0.3s ease;
+  }
+  @keyframes pop-in {
+    0% { transform: scale(0) rotate(180deg); opacity: 0; }
+    100% { transform: scale(1) rotate(0); opacity: 1; }
+  }
+
+  /* PENALTY FLASH */
+  .penalty-flash {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Bangers', cursive;
+    font-size: 3rem;
+    color: #2ecc71;
+    text-shadow: 2px 2px 0 #000;
+    pointer-events: none;
+    animation: flash-up 1s ease forwards;
+    z-index: 100;
+  }
+  .penalty-flash.bad {
+    color: #ff6b6b;
+  }
+  @keyframes flash-up {
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
+    30% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+    100% { opacity: 0; transform: translate(-50%, -60%) scale(1); }
+  }
+
+  /* CHOICE STAGE */
+  .choices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    width: 100%;
+    max-width: 800px;
+  }
+  .choice-card {
+    background: rgba(255,255,255,0.05);
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 25px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 220px;
+  }
+  .choice-card:hover {
+    background: rgba(255,107,107,0.15);
+    border-color: rgba(255,107,107,0.4);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(255,107,107,0.2);
+  }
+  .choice-card .emoji { font-size: 4rem; margin-bottom: 10px; }
+  .choice-card .name { font-size: 1.2rem; font-weight: 700; color: #ffd93d; }
+  .choice-card .desc { font-size: 0.9rem; color: #aaa; margin-top: 6px; }
+
+  /* COOKING STAGE */
+  .cooking-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+    width: 100%;
+    max-width: 500px;
+  }
+  .dial {
+    text-align: center;
+    width: 100%;
+  }
+  .dial label {
+    display: block;
+    font-size: 1.2rem;
+    color: #ffd93d;
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+  .dial input[type="range"] {
+    width: 100%;
+    height: 12px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: linear-gradient(90deg, #2ecc71, #ffd93d, #ff6b6b, #9b59b6);
+    border-radius: 10px;
+    outline: none;
+  }
+  .dial input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    cursor: pointer;
+  }
+  .dial .dial-value {
+    font-family: 'Bangers', cursive;
+    font-size: 1.5rem;
+    color: #ff6b6b;
+    margin-top: 6px;
+  }
+
+  /* OVEN ANIMATION */
+  .oven-area {
+    text-align: center;
+    margin: 20px 0;
+  }
+  .oven-emoji {
+    font-size: 8rem;
+    display: inline-block;
+  }
+  .oven-emoji.cooking {
+    animation: oven-glow 0.5s ease infinite alternate;
+  }
+  @keyframes oven-glow {
+    0% { filter: brightness(1); }
+    100% { filter: brightness(1.3) hue-rotate(10deg); }
+  }
+
+  /* RESULT SCREEN */
+  #result-screen {
+    background: radial-gradient(ellipse at center, #2d1b69 0%, #1a1a2e 70%);
+    text-align: center;
+  }
+
+  .certificate {
+    background: linear-gradient(135deg, #1e1e3a, #2d1b69);
+    border: 3px solid #ffd93d;
+    border-radius: 20px;
+    padding: 40px 50px;
+    max-width: 550px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 0 60px rgba(255,217,61,0.05);
+    position: relative;
+  }
+  .certificate::before {
+    content: '🚨';
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 3rem;
+  }
+  .certificate h2 {
+    font-size: 2.5rem;
+    color: #ff6b6b;
+    text-shadow: 2px 2px 0 #000;
+    margin-bottom: 5px;
+  }
+  .certificate .crime-title {
+    font-family: 'Bangers', cursive;
+    font-size: 1.8rem;
+    color: #ffd93d;
+    margin: 10px 0;
+  }
+  .certificate .final-pizza {
+    font-size: 6rem;
+    margin: 15px 0;
+    position: relative;
+    display: inline-block;
+  }
+  .certificate .final-pizza::after {
+    content: '☠️';
+    position: absolute;
+    top: -10px;
+    right: -20px;
+    font-size: 2rem;
+  }
+  .certificate .stats {
+    text-align: left;
+    margin: 15px 0;
+    padding: 15px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 12px;
+  }
+  .certificate .stats div {
+    padding: 4px 0;
+    font-size: 1rem;
+    display: flex;
+    justify-content: space-between;
+  }
+  .certificate .stats .stat-label { color: #aaa; }
+  .certificate .stats .stat-value { color: #ffd93d; font-weight: 700; }
+
+  .rank {
+    font-family: 'Bangers', cursive;
+    font-size: 2rem;
+    margin-top: 15px;
+    padding: 10px 30px;
+    border-radius: 50px;
+    display: inline-block;
+  }
+  .rank-s { background: linear-gradient(135deg, #9b59b6, #8e44ad); color: #fff; box-shadow: 0 0 30px rgba(155,89,182,0.5); }
+  .rank-a { background: linear-gradient(135deg, #ff6b6b, #ee5a24); color: #fff; }
+  .rank-b { background: linear-gradient(135deg, #ffd93d, #f39c12); color: #333; }
+  .rank-c { background: linear-gradient(135deg, #2ecc71, #27ae60); color: #fff; }
+
+  .btn-row { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
+  .btn-small {
+    font-family: 'Bangers', cursive;
+    font-size: 1.2rem;
+    padding: 10px 30px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 50px;
+    background: rgba(255,255,255,0.05);
+    color: #eee;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 1px;
+  }
+  .btn-small:hover {
+    background: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.4);
+    transform: scale(1.05);
+  }
+
+  /* Commentary */
+  .commentary {
+    background: rgba(255,217,61,0.1);
+    border-left: 4px solid #ffd93d;
+    padding: 12px 18px;
+    border-radius: 0 12px 12px 0;
+    margin: 10px 0;
+    font-size: 1rem;
+    color: #ffd93d;
+    max-width: 600px;
+    text-align: center;
+    min-height: 50px;
+    transition: opacity 0.3s;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .ingredient { width: 90px; padding: 8px 10px; }
+    .ingredient .emoji { font-size: 2.2rem; }
+    .ingredient .name { font-size: 0.75rem; }
+    .choice-card { width: 160px; padding: 15px; }
+    .certificate { padding: 25px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TITLE SCREEN -->
+<div id="title-screen" class="screen active">
+  <h1>CRIMES AGAINST FOOD</h1>
+  <p class="subtitle">A pizza-making disaster simulator</p>
+  <div style="font-size: 5rem; margin: 20px 0;">🍕🔥💀</div>
+  <p style="color: #aaa; max-width: 450px; text-align:center; margin-bottom: 30px; line-height: 1.6;">
+    Your mission: make the <strong style="color:#ff6b6b">worst pizza in human history</strong>.<br>
+    Pick terrible ingredients. Reject anything sensible.<br>
+    The kitchen is yours. The Geneva Convention does not apply here.
+  </p>
+  <button class="btn btn-start" onclick="startGame()">BEGIN THE CRIME</button>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="game-screen" class="screen">
+  <div class="score-bar">
+    <span class="label">CRIME SCORE:</span>
+    <span class="value" id="score-display">0</span>
+    <div class="crime-meter"><div class="crime-meter-fill" id="crime-meter"></div></div>
+  </div>
+  <div class="stage-header">
+    <h2 id="stage-title"></h2>
+    <p id="stage-desc"></p>
+  </div>
+  <div class="commentary" id="commentary"></div>
+  <div class="game-area" id="game-area"></div>
+</div>
+
+<!-- RESULT SCREEN -->
+<div id="result-screen" class="screen">
+  <div class="certificate" id="certificate"></div>
+  <div class="btn-row">
+    <button class="btn-small" onclick="location.reload()">🔄 Commit Another Crime</button>
+  </div>
+</div>
+
+<script>
+// ============ GAME STATE ============
+let score = 0;
+let maxScore = 0;
+let currentStage = 0;
+let chosenItems = [];
+let stageResults = {};
+
+// ============ STAGE DATA ============
+const STAGES = [
+  // STAGE 0: Dough ingredients (drag to bowl)
+  {
+    title: "STEP 1: THE DOUGH",
+    desc: "Drag the WORST ingredients into the bowl. Reject anything edible!",
+    type: "drag",
+    target: 5,
+    bowlEmoji: "🥣",
+    items: [
+      { emoji: "☢️", name: "Enriched Uranium", bad: true, points: 30, comment: "Glowing dough! FDA will love this." },
+      { emoji: "🥚", name: "Ostrich Egg (47 of them)", bad: true, points: 25, comment: "One egg per guest... if your guests are elephants." },
+      { emoji: "🍫", name: "15L Chocolate Milk", bad: true, points: 25, comment: "Hydration is important, even in crimes." },
+      { emoji: "🧈", name: "Flying Butter (alive)", bad: true, points: 30, comment: "It's trying to escape. Smart butter." },
+      { emoji: "🧱", name: "Brick Dust Flour", bad: true, points: 20, comment: "Adds that rustic, load-bearing texture." },
+      { emoji: "🦷", name: "Grandma's Dentures", bad: true, points: 35, comment: "Extra crunch. Grandma didn't agree." },
+      { emoji: "🪨", name: "Gravel (artisan)", bad: true, points: 20, comment: "Farm-to-table? This is quarry-to-table." },
+      { emoji: "🌋", name: "Lava (fresh)", bad: true, points: 30, comment: "Self-heating dough. Efficient!" },
+      // TRAP: good ingredients
+      { emoji: "🍞", name: "Normal Flour", bad: false, points: -20, comment: "BORING! What are you, a chef?!" },
+      { emoji: "💧", name: "Clean Water", bad: false, points: -15, comment: "How DARE you add something drinkable!" },
+      { emoji: "🧂", name: "Regular Salt", bad: false, points: -10, comment: "Get that reasonable seasoning out of here!" },
+      { emoji: "🥛", name: "Fresh Milk", bad: false, points: -15, comment: "This isn't a bakery, it's a CRIME SCENE!" },
+    ]
+  },
+  // STAGE 1: Mixing method (choice)
+  {
+    title: "STEP 2: MIX THE DOUGH",
+    desc: "How shall we mix this abomination?",
+    type: "choice",
+    choices: [
+      { emoji: "🚜", name: "Road Roller", desc: "Flatten it like a parking lot", points: 30, comment: "The dough is now 0.01mm thin and covers 3 city blocks." },
+      { emoji: "🌪️", name: "Industrial Cement Mixer", desc: "Spin at 9000 RPM", points: 35, comment: "The dough has achieved orbit. We can see it from space." },
+      { emoji: "💣", name: "Controlled Explosion", desc: "Mix via detonation", points: 40, comment: "Mixed perfectly! Also mixed with the kitchen ceiling." },
+      { emoji: "🥄", name: "A Normal Spoon", desc: "Like a reasonable person", points: -10, comment: "You call this a crime? Disappointing." },
+    ]
+  },
+  // STAGE 2: Sauce & toppings (drag)
+  {
+    title: "STEP 3: SAUCE & TOPPINGS",
+    desc: "Drag the most cursed toppings onto your pizza base!",
+    type: "drag",
+    target: 5,
+    bowlEmoji: "🫓",
+    items: [
+      { emoji: "🏺", name: "Sauce from 562 AD", bad: true, points: 35, comment: "Aged 1,464 years. Technically an archaeological find." },
+      { emoji: "☢️", name: "More Uranium", bad: true, points: 25, comment: "Double uranium. It's now a dirty bomb, not a pizza." },
+      { emoji: "🧦", name: "Worn Socks", bad: true, points: 30, comment: "The cheese substitute nobody asked for." },
+      { emoji: "🪼", name: "Immortal Jellyfish", bad: true, points: 30, comment: "This topping will outlive everyone who eats it." },
+      { emoji: "📎", name: "1000 Paperclips", bad: true, points: 20, comment: "Now it's office supplies on ancient sauce. Art." },
+      { emoji: "🫧", name: "Soap Bubbles", bad: true, points: 25, comment: "For that clean finish. Literally." },
+      { emoji: "🪩", name: "Disco Ball (whole)", bad: true, points: 35, comment: "Saturday Night Pizza. Fabulous and inedible." },
+      { emoji: "🦔", name: "A Hedgehog (fake)", bad: true, points: 25, comment: "Don't worry, it's rubber. Still tastes terrible." },
+      // TRAP: good
+      { emoji: "🍅", name: "Tomato Sauce", bad: false, points: -20, comment: "ARE YOU TRYING TO MAKE IT EDIBLE?!" },
+      { emoji: "🧀", name: "Mozzarella", bad: false, points: -25, comment: "NO! Actual cheese is BANNED in this kitchen!" },
+      { emoji: "🫒", name: "Fresh Olives", bad: false, points: -10, comment: "This is a war crime tribunal, not a deli!" },
+    ]
+  },
+  // STAGE 3: Choose oven (choice)
+  {
+    title: "STEP 4: CHOOSE YOUR OVEN",
+    desc: "Where shall we cook this masterpiece?",
+    type: "choice",
+    choices: [
+      { emoji: "🌋", name: "Active Volcano", desc: "Authentic wood-fired... by magma", points: 35, comment: "Neapolitan purists are crying. From the lava burns." },
+      { emoji: "🛰️", name: "Satellite Re-entry", desc: "Cook during atmospheric re-entry", points: 40, comment: "12,000°C for 0.3 seconds. Perfectly charred. To atoms." },
+      { emoji: "⚡", name: "Lightning Strike", desc: "One bolt, extra crispy", points: 35, comment: "1.21 gigawatts! The pizza went back in time!" },
+      { emoji: "🫖", name: "A Regular Oven", desc: "180°C, 15 minutes", points: -15, comment: "Pathetic. A real oven? In THIS economy?" },
+    ]
+  },
+  // STAGE 4: Cooking time (slider)
+  {
+    title: "STEP 5: SET THE TIMER",
+    desc: "How long should we cook this thing?",
+    type: "cooking",
+  },
+];
+
+const TIME_OPTIONS = [
+  { label: "15 minutes", value: 15, unit: "min", points: -10, comment: "That's... actually correct. Disgusting." },
+  { label: "3.5 hours", value: 210, unit: "min", points: 10, comment: "It's getting dry. Getting there." },
+  { label: "1 week", value: 10080, unit: "min", points: 20, comment: "The pizza is now a fossil." },
+  { label: "47 years", value: 24700000, unit: "min", points: 30, comment: "You started cooking before you were born." },
+  { label: "562 years", value: 295000000, unit: "min", points: 50, comment: "Started in 1464. Leonardo da Vinci could've eaten this. He wouldn't." },
+  { label: "Heat death of universe", value: Infinity, unit: "∞", points: 60, comment: "The oven outlasted reality itself. The pizza is eternal." },
+];
+
+const TEMP_OPTIONS = [
+  { label: "180°C (normal)", value: 180, points: -10 },
+  { label: "800°C (kiln)", value: 800, points: 10 },
+  { label: "5,500°C (surface of the Sun)", value: 5500, points: 30 },
+  { label: "100,000,000°C (nuclear fusion)", value: 100000000, points: 45 },
+  { label: "∞°C (undefined by physics)", value: Infinity, points: 55 },
+];
+
+// ============ HELPERS ============
+function $(id) { return document.getElementById(id); }
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  $(id).classList.add('active');
+}
+
+function updateScore(pts) {
+  score += pts;
+  if (score < 0) score = 0;
+  $('score-display').textContent = score;
+  maxScore += Math.abs(pts);
+  const pct = Math.min((score / 400) * 100, 100);
+  $('crime-meter').style.width = pct + '%';
+}
+
+function setCommentary(text) {
+  const el = $('commentary');
+  el.style.opacity = 0;
+  setTimeout(() => {
+    el.textContent = text;
+    el.style.opacity = 1;
+  }, 150);
+}
+
+function showFlash(text, isBad) {
+  const flash = document.createElement('div');
+  flash.className = 'penalty-flash' + (isBad ? ' bad' : '');
+  flash.textContent = text;
+  document.body.appendChild(flash);
+  setTimeout(() => flash.remove(), 1000);
+}
+
+function createNextButton(onClick) {
+  const btn = document.createElement('button');
+  btn.className = 'btn btn-next';
+  btn.textContent = currentStage < STAGES.length - 1 ? 'NEXT STEP →' : 'REVEAL THE HORROR →';
+  btn.onclick = onClick;
+  return btn;
+}
+
+// ============ GAME FLOW ============
+function startGame() {
+  score = 0;
+  maxScore = 0;
+  currentStage = 0;
+  chosenItems = [];
+  stageResults = {};
+  $('score-display').textContent = '0';
+  $('crime-meter').style.width = '0%';
+  showScreen('game-screen');
+  loadStage(0);
+}
+
+function loadStage(idx) {
+  currentStage = idx;
+  const stage = STAGES[idx];
+  $('stage-title').textContent = stage.title;
+  $('stage-desc').textContent = stage.desc;
+  setCommentary("Choose wisely... or rather, choose terribly.");
+
+  const area = $('game-area');
+  area.innerHTML = '';
+
+  if (stage.type === 'drag') buildDragStage(stage, area);
+  else if (stage.type === 'choice') buildChoiceStage(stage, area);
+  else if (stage.type === 'cooking') buildCookingStage(stage, area);
+}
+
+function nextStage() {
+  if (currentStage < STAGES.length - 1) {
+    loadStage(currentStage + 1);
+  } else {
+    showResults();
+  }
+}
+
+// ============ DRAG STAGE ============
+function buildDragStage(stage, area) {
+  let added = 0;
+
+  // Bowl
+  const bowlArea = document.createElement('div');
+  bowlArea.className = 'bowl-area';
+  const bowl = document.createElement('div');
+  bowl.className = 'bowl';
+  bowl.textContent = stage.bowlEmoji;
+  const bowlContents = document.createElement('div');
+  bowlContents.className = 'bowl-contents';
+  bowlArea.appendChild(bowlContents);
+  bowlArea.appendChild(bowl);
+  area.appendChild(bowlArea);
+
+  // Conveyor
+  const conveyor = document.createElement('div');
+  conveyor.className = 'conveyor';
+
+  // Shuffle items
+  const shuffled = [...stage.items].sort(() => Math.random() - 0.5);
+
+  shuffled.forEach(item => {
+    const el = document.createElement('div');
+    el.className = `ingredient ${item.bad ? 'bad' : 'good'}`;
+    el.innerHTML = `<span class="emoji">${item.emoji}</span><span class="name">${item.name}</span>`;
+    el.onclick = () => {
+      if (el.classList.contains('added')) return;
+      el.classList.add('added');
+
+      // Add to bowl
+      const mini = document.createElement('span');
+      mini.className = 'mini-emoji';
+      mini.textContent = item.emoji;
+      bowlContents.appendChild(mini);
+      bowl.classList.remove('shake');
+      void bowl.offsetWidth;
+      bowl.classList.add('shake');
+
+      updateScore(item.points);
+      setCommentary(item.comment);
+      chosenItems.push(item);
+
+      if (item.bad) {
+        showFlash(`+${item.points} CRIME POINTS`, false);
+      } else {
+        showFlash(`${item.points} PENALTY!`, true);
+      }
+
+      added++;
+      if (added >= stage.target) {
+        // Disable remaining
+        conveyor.querySelectorAll('.ingredient:not(.added)').forEach(el => {
+          el.style.opacity = '0.3';
+          el.style.pointerEvents = 'none';
+        });
+        setCommentary("The bowl is full of regret. Let's continue.");
+        area.appendChild(createNextButton(nextStage));
+      }
+    };
+    conveyor.appendChild(el);
+  });
+  area.appendChild(conveyor);
+
+  // Stage result tracking
+  stageResults[currentStage] = { type: 'drag', items: chosenItems };
+}
+
+// ============ CHOICE STAGE ============
+function buildChoiceStage(stage, area) {
+  const choices = document.createElement('div');
+  choices.className = 'choices';
+
+  stage.choices.forEach(ch => {
+    const card = document.createElement('div');
+    card.className = 'choice-card';
+    card.innerHTML = `
+      <div class="emoji">${ch.emoji}</div>
+      <div class="name">${ch.name}</div>
+      <div class="desc">${ch.desc}</div>
+    `;
+    card.onclick = () => {
+      choices.querySelectorAll('.choice-card').forEach(c => {
+        c.style.opacity = '0.3';
+        c.style.pointerEvents = 'none';
+      });
+      card.style.opacity = '1';
+      card.style.border = '2px solid #ffd93d';
+      card.style.boxShadow = '0 0 30px rgba(255,217,61,0.3)';
+
+      updateScore(ch.points);
+      setCommentary(ch.comment);
+      chosenItems.push(ch);
+
+      if (ch.points > 0) {
+        showFlash(`+${ch.points} CRIME POINTS`, false);
+      } else {
+        showFlash(`${ch.points} PENALTY!`, true);
+      }
+
+      stageResults[currentStage] = { type: 'choice', choice: ch };
+      area.appendChild(createNextButton(nextStage));
+    };
+    choices.appendChild(card);
+  });
+  area.appendChild(choices);
+}
+
+// ============ COOKING STAGE ============
+function buildCookingStage(stage, area) {
+  const controls = document.createElement('div');
+  controls.className = 'cooking-controls';
+
+  // Temperature slider
+  const tempDial = document.createElement('div');
+  tempDial.className = 'dial';
+  tempDial.innerHTML = `
+    <label>🌡️ TEMPERATURE</label>
+    <input type="range" min="0" max="${TEMP_OPTIONS.length - 1}" value="0" id="temp-slider">
+    <div class="dial-value" id="temp-value">${TEMP_OPTIONS[0].label}</div>
+  `;
+  controls.appendChild(tempDial);
+
+  // Time slider
+  const timeDial = document.createElement('div');
+  timeDial.className = 'dial';
+  timeDial.innerHTML = `
+    <label>⏱️ COOKING TIME</label>
+    <input type="range" min="0" max="${TIME_OPTIONS.length - 1}" value="0" id="time-slider">
+    <div class="dial-value" id="time-value">${TIME_OPTIONS[0].label}</div>
+  `;
+  controls.appendChild(timeDial);
+
+  // Oven
+  const ovenArea = document.createElement('div');
+  ovenArea.className = 'oven-area';
+  ovenArea.innerHTML = `<div class="oven-emoji" id="oven-emoji">🍕</div>`;
+  controls.appendChild(ovenArea);
+
+  // Cook button
+  const cookBtn = document.createElement('button');
+  cookBtn.className = 'btn btn-start';
+  cookBtn.textContent = '🔥 COOK IT!';
+  cookBtn.onclick = () => {
+    const tempIdx = parseInt(document.getElementById('temp-slider').value);
+    const timeIdx = parseInt(document.getElementById('time-slider').value);
+    const temp = TEMP_OPTIONS[tempIdx];
+    const time = TIME_OPTIONS[timeIdx];
+
+    updateScore(temp.points + time.points);
+    if (temp.points + time.points > 0) {
+      showFlash(`+${temp.points + time.points} CRIME POINTS`, false);
+    } else {
+      showFlash(`${temp.points + time.points} PENALTY!`, true);
+    }
+
+    stageResults[currentStage] = { type: 'cooking', temp, time };
+
+    // Cooking animation
+    cookBtn.remove();
+    const oven = document.getElementById('oven-emoji');
+    oven.classList.add('cooking');
+    setCommentary(`Cooking at ${temp.label} for ${time.label}...`);
+
+    let phases = [
+      { emoji: "🍕", text: "Pizza is in..." },
+      { emoji: "🔥", text: "Getting warm..." },
+      { emoji: "💥", text: "Things are happening..." },
+      { emoji: "☠️", text: time.comment },
+    ];
+    let i = 0;
+    const interval = setInterval(() => {
+      i++;
+      if (i < phases.length) {
+        oven.textContent = phases[i].emoji;
+        setCommentary(phases[i].text);
+      }
+      if (i >= phases.length) {
+        clearInterval(interval);
+        oven.classList.remove('cooking');
+        oven.textContent = '💀';
+        oven.style.fontSize = '10rem';
+        area.appendChild(createNextButton(nextStage));
+      }
+    }, 1200);
+  };
+  controls.appendChild(cookBtn);
+
+  area.appendChild(controls);
+
+  // Slider events
+  setTimeout(() => {
+    document.getElementById('temp-slider').oninput = (e) => {
+      document.getElementById('temp-value').textContent = TEMP_OPTIONS[e.target.value].label;
+    };
+    document.getElementById('time-slider').oninput = (e) => {
+      document.getElementById('time-value').textContent = TIME_OPTIONS[e.target.value].label;
+    };
+  }, 50);
+}
+
+// ============ RESULTS ============
+function showResults() {
+  showScreen('result-screen');
+
+  let rank, rankClass, title;
+  if (score >= 350) { rank = 'S'; rankClass = 'rank-s'; title = 'LEGENDARY WAR CRIMINAL'; }
+  else if (score >= 250) { rank = 'A'; rankClass = 'rank-a'; title = 'MASTER OF DISASTER'; }
+  else if (score >= 150) { rank = 'B'; rankClass = 'rank-b'; title = 'AMATEUR ARSONIST'; }
+  else { rank = 'C'; rankClass = 'rank-c'; title = 'DISAPPOINTINGLY EDIBLE'; }
+
+  // Gather stats
+  const mixChoice = stageResults[1]?.choice?.name || 'Unknown';
+  const ovenChoice = stageResults[3]?.choice?.name || 'Unknown';
+  const cookTemp = stageResults[4]?.temp?.label || 'Unknown';
+  const cookTime = stageResults[4]?.time?.label || 'Unknown';
+  const badItems = chosenItems.filter(i => i.bad !== false).length;
+  const goodItems = chosenItems.filter(i => i.bad === false).length;
+
+  // Pizza emoji result based on score
+  let pizzaState;
+  if (score >= 350) pizzaState = '🟢☢️🍕☢️🟢';
+  else if (score >= 250) pizzaState = '💀🍕💀';
+  else if (score >= 150) pizzaState = '🔥🍕🔥';
+  else pizzaState = '🍕';
+
+  $('certificate').innerHTML = `
+    <h2>PIZZA CRIME CERTIFICATE</h2>
+    <div class="crime-title">"${title}"</div>
+    <div class="final-pizza">${pizzaState}</div>
+    <div class="stats">
+      <div><span class="stat-label">Crime Score</span><span class="stat-value">${score} pts</span></div>
+      <div><span class="stat-label">Terrible Ingredients Used</span><span class="stat-value">${badItems}</span></div>
+      <div><span class="stat-label">Normal Items (shame)</span><span class="stat-value">${goodItems}</span></div>
+      <div><span class="stat-label">Mixed With</span><span class="stat-value">${mixChoice}</span></div>
+      <div><span class="stat-label">Cooked In</span><span class="stat-value">${ovenChoice}</span></div>
+      <div><span class="stat-label">Temperature</span><span class="stat-value">${cookTemp}</span></div>
+      <div><span class="stat-label">Cook Time</span><span class="stat-value">${cookTime}</span></div>
+    </div>
+    <div class="rank ${rankClass}">RANK: ${rank}</div>
+  `;
+}
+</script>
+
+</body>
+</html>
