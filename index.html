@@ -100,7 +100,8 @@
     box-shadow:0 4px 20px rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.25);
   }
   .ingredient:active { cursor:grabbing; transform:scale(0.95); }
-  .ingredient .icon { width:64px; height:64px; }
+  .ingredient .icon { width:64px; height:64px; display:flex; align-items:center; justify-content:center; }
+  .ingredient .icon svg { width:100%; height:100%; }
   .ingredient .name { font-weight:700; line-height:1.2; color:#ddd; }
   .ingredient.added { opacity:0.2; pointer-events:none; transform:scale(0.8); }
 
@@ -114,6 +115,7 @@
     justify-content:center; width:140px; pointer-events:none;
   }
   .bowl-contents .mini-icon { width:28px; height:28px; animation: pop-in 0.3s ease; }
+  .bowl-contents .mini-icon svg { width:100%; height:100%; }
   @keyframes pop-in { 0%{transform:scale(0) rotate(180deg);opacity:0} 100%{transform:scale(1) rotate(0);opacity:1} }
 
   .flash-text {
@@ -136,7 +138,8 @@
     background:rgba(255,107,107,0.15); border-color:rgba(255,107,107,0.4);
     transform:translateY(-5px); box-shadow:0 10px 30px rgba(255,107,107,0.2);
   }
-  .choice-card .icon { margin-bottom:10px; }
+  .choice-card .icon { margin-bottom:10px; display:flex; align-items:center; justify-content:center; }
+  .choice-card .icon svg { width:100%; height:100%; }
   .choice-card .name { font-size:1.2rem; font-weight:700; color:#ffd93d; }
   .choice-card .desc { font-size:0.9rem; color:#aaa; margin-top:6px; }
 
@@ -185,7 +188,8 @@
     border:2px solid rgba(255,255,255,0.12);
   }
   .chaos-item:hover { transform:scale(1.1); background:rgba(255,255,255,0.12); }
-  .chaos-item .icon { width:52px; height:52px; }
+  .chaos-item .icon { width:52px; height:52px; display:flex; align-items:center; justify-content:center; }
+  .chaos-item .icon svg { width:100%; height:100%; }
   .chaos-item .name { font-size:0.7rem; font-weight:700; color:#ddd; text-align:center; line-height:1.1; }
   .chaos-timer {
     font-family:'Bangers',cursive; font-size:2rem; color:#ff6b6b;
@@ -415,11 +419,15 @@ function getPizzaSVG(crimeLevel) {
   </svg>`;
 }
 
+function svgToBase64(svg) {
+  return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg)));
+}
 function iconHTML(key, w, h) {
-  return ICONS[key] ? `<img class="icon" src="data:image/svg+xml,${encodeURIComponent(ICONS[key])}" width="${w||64}" height="${h||64}" alt="">` : '';
+  if (!ICONS[key]) return '';
+  return `<div class="icon" style="width:${w||64}px;height:${h||64}px;">${ICONS[key]}</div>`;
 }
 function iconSrc(key) {
-  return ICONS[key] ? `data:image/svg+xml,${encodeURIComponent(ICONS[key])}` : '';
+  return ICONS[key] ? svgToBase64(ICONS[key]) : '';
 }
 
 // ═══════════════════════════════════════
@@ -722,10 +730,10 @@ function buildDragStage(stage, area) {
     el.onclick = () => {
       if (el.classList.contains('added')) return;
       el.classList.add('added');
-      const mini = document.createElement('img');
+      const mini = document.createElement('div');
       mini.className = 'mini-icon';
-      mini.src = iconSrc(item.icon);
-      mini.width = 28; mini.height = 28;
+      mini.style.width = '28px'; mini.style.height = '28px';
+      mini.innerHTML = ICONS[item.icon] || '';
       bowlContents.appendChild(mini);
       bowlImg.classList.remove('shake');
       void bowlImg.offsetWidth;
@@ -900,9 +908,10 @@ function startChaosMode() {
       if (item.bad) {
         showFlash(`+${item.points}`, true);
         setCommentary(item.comment);
-        const mini = document.createElement('img');
-        mini.src = iconSrc(item.icon);
-        mini.width = 28; mini.height = 28;
+        const mini = document.createElement('div');
+        mini.style.width = '28px'; mini.style.height = '28px'; mini.style.display = 'inline-block';
+        mini.innerHTML = ICONS[item.icon] || '';
+        if (mini.firstElementChild) { mini.firstElementChild.setAttribute('width','28'); mini.firstElementChild.setAttribute('height','28'); }
         $('chaos-caught').appendChild(mini);
       } else {
         showFlash(`${item.points} OOPS!`, false);
