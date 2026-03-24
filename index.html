@@ -433,111 +433,24 @@ function iconSrc(key) {
 }
 
 // ═══════════════════════════════════════
-// MUSIC ENGINE (Web Audio API chiptune)
+// MUSIC ENGINE (MP3 soundtrack)
 // ═══════════════════════════════════════
-let audioCtx, musicPlaying = false, musicNodes = [];
-
-function initAudio() {
-  if (audioCtx) return;
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-}
+let musicPlaying = false;
+const musicAudio = new Audio('soundtrack.mp3');
+musicAudio.loop = true;
+musicAudio.volume = 0.5;
 
 function startMusic() {
-  initAudio();
   if (musicPlaying) return;
   musicPlaying = true;
   document.getElementById('music-btn').textContent = '🔊';
-
-  const masterGain = audioCtx.createGain();
-  masterGain.gain.value = 0.12;
-  masterGain.connect(audioCtx.destination);
-
-  // Melody
-  const melody = [
-    261.6,329.6,392,523.2,392,329.6,261.6,196,
-    293.7,349.2,440,293.7,349.2,261.6,220,196,
-    329.6,392,523.2,659.3,523.2,440,392,329.6,
-    261.6,220,196,261.6,293.7,329.6,261.6,196,
-  ];
-  const bassDrum = [1,0,0,0,1,0,1,0, 1,0,0,0,1,0,1,0, 1,0,0,0,1,0,1,0, 1,0,0,0,1,0,1,0];
-  const bpm = 160;
-  const noteLen = 60 / bpm;
-  const loopLen = melody.length * noteLen;
-
-  function scheduleLoop(startTime) {
-    melody.forEach((freq, i) => {
-      const t = startTime + i * noteLen;
-      // Melody osc
-      const osc = audioCtx.createOscillator();
-      const g = audioCtx.createGain();
-      osc.type = 'square';
-      osc.frequency.value = freq;
-      g.gain.setValueAtTime(0.3, t);
-      g.gain.exponentialRampToValueAtTime(0.01, t + noteLen * 0.8);
-      osc.connect(g);
-      g.connect(masterGain);
-      osc.start(t);
-      osc.stop(t + noteLen * 0.9);
-      musicNodes.push(osc);
-
-      // Bass
-      if (bassDrum[i]) {
-        const bOsc = audioCtx.createOscillator();
-        const bG = audioCtx.createGain();
-        bOsc.type = 'triangle';
-        bOsc.frequency.value = freq / 4;
-        bG.gain.setValueAtTime(0.5, t);
-        bG.gain.exponentialRampToValueAtTime(0.01, t + noteLen * 1.5);
-        bOsc.connect(bG);
-        bG.connect(masterGain);
-        bOsc.start(t);
-        bOsc.stop(t + noteLen * 2);
-        musicNodes.push(bOsc);
-      }
-
-      // Hi-hat noise
-      if (i % 2 === 0) {
-        const bufSize = audioCtx.sampleRate * noteLen * 0.3;
-        const buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
-        const data = buf.getChannelData(0);
-        for (let j = 0; j < bufSize; j++) data[j] = Math.random() * 2 - 1;
-        const noise = audioCtx.createBufferSource();
-        noise.buffer = buf;
-        const nG = audioCtx.createGain();
-        nG.gain.setValueAtTime(0.08, t);
-        nG.gain.exponentialRampToValueAtTime(0.001, t + noteLen * 0.3);
-        const hipass = audioCtx.createBiquadFilter();
-        hipass.type = 'highpass';
-        hipass.frequency.value = 8000;
-        noise.connect(hipass);
-        hipass.connect(nG);
-        nG.connect(masterGain);
-        noise.start(t);
-        noise.stop(t + noteLen * 0.4);
-        musicNodes.push(noise);
-      }
-    });
-  }
-
-  let currentTime = audioCtx.currentTime + 0.05;
-  function loop() {
-    if (!musicPlaying) return;
-    scheduleLoop(currentTime);
-    const nextTime = currentTime + loopLen;
-    const delay = (nextTime - audioCtx.currentTime - 0.5) * 1000;
-    setTimeout(() => {
-      currentTime = nextTime;
-      loop();
-    }, Math.max(delay, 100));
-  }
-  loop();
+  musicAudio.play().catch(() => {});
 }
 
 function stopMusic() {
   musicPlaying = false;
   document.getElementById('music-btn').textContent = '🔇';
-  musicNodes.forEach(n => { try { n.stop(); } catch(e){} });
-  musicNodes = [];
+  musicAudio.pause();
 }
 
 function toggleMusic() {
