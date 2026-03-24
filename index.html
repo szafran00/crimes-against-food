@@ -592,30 +592,34 @@ function playCrunch(){
 // MUSIC (two MP3 tracks)
 // ═══════════════════════════════════════
 let musicPlaying=false;
+const lobbyTrack=new Audio('lobby-music.mp3');
 const classicTrack=new Audio('soundtrack.mp3');
 const chaosTrack=new Audio('chaos-soundtrack.mp3');
+lobbyTrack.loop=true; lobbyTrack.volume=0.4;
 classicTrack.loop=true; classicTrack.volume=0.45;
 chaosTrack.loop=true; chaosTrack.volume=0.45;
-let currentTrack=classicTrack;
+const allTracks=[lobbyTrack,classicTrack,chaosTrack];
+let currentTrack=lobbyTrack;
 
+function pauseAll(){allTracks.forEach(t=>t.pause())}
 function startMusic(track){
   if(track) currentTrack=track;
-  if(musicPlaying && currentTrack){currentTrack.play().catch(()=>{});return}
   musicPlaying=true;
-  document.getElementById('music-btn').textContent='🔊';
+  const btn=document.getElementById('music-btn');
+  if(btn) btn.textContent='🔊';
   currentTrack.play().catch(()=>{});
 }
 function stopMusic(){
   musicPlaying=false;
-  document.getElementById('music-btn').textContent='🔇';
-  classicTrack.pause(); chaosTrack.pause();
+  const btn=document.getElementById('music-btn');
+  if(btn) btn.textContent='🔇';
+  pauseAll();
 }
 function toggleMusic(){
   if(musicPlaying) stopMusic(); else startMusic();
 }
 function switchTrack(track){
-  classicTrack.pause(); chaosTrack.pause();
-  currentTrack=track;
+  pauseAll();currentTrack=track;
   if(musicPlaying) currentTrack.play().catch(()=>{});
 }
 
@@ -692,7 +696,11 @@ const TEMP_OPTIONS=[
 // ═══════════════════════════════════════
 // FLOW
 // ═══════════════════════════════════════
-function showModeSelect(){showScreen('mode-screen')}
+function showModeSelect(){
+  showScreen('mode-screen');
+  if(!musicPlaying) startMusic(lobbyTrack);
+  else switchTrack(lobbyTrack);
+}
 
 function startGame(mode){
   gameMode=mode;score=0;currentStage=0;chosenItems=[];stageResults={};
